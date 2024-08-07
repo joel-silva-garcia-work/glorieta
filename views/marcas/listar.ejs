@@ -1,0 +1,29 @@
+<!-- views/marcas/listar.ejs -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Configura tus metadatos y estilos aquí -->
+</head>
+<body>
+    <h1>Lista de Marcas</h1>
+    <table>
+        <!-- Itera sobre las marcas y muestra los detalles en la tabla -->
+        <% marcas.data.forEach(marca => { %>
+            <tr>
+                <td><%= marca.id %></td>
+                <td><%= marca.nombre %></td>
+                <td><%= marca.descripcion %></td>
+            </tr>
+        <% }); %>
+    </table>
+    <!-- Agrega un formulario para filtrar las marcas -->
+    <form action="/marca" method="get">
+        <input type="hidden" name="queryType" value="one">
+        <input type="hidden" name="page" value= 0>
+        <input type="hidden" name="limit" value= 3>
+        <button type="submit">Filtrar</button>
+    </form>
+    <!-- Agrega tus scripts JavaScript aquí -->
+</body>
+</html>
