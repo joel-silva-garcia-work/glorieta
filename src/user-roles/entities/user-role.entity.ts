@@ -8,6 +8,6 @@ export class UserRole extends BasicEntity{
     @ManyToOne(() => Role, { eager: true })
     role: Role;
     
-    @ManyToOne(() => User, { eager: true })
+    @ManyToOne(() => User, { eager: false })
     user: User;
 }

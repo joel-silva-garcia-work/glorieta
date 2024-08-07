@@ -1,8 +1,10 @@
 import { BasicInformationEntity } from 'src/common/base/entities';
 import { Locality } from 'src/locality/entities/locality.entity';
 import { Municipality } from 'src/municipality/entities/municipality.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Index } from 'typeorm';
+import { v4 } from 'uuid'
 
+@Index(v4(), ['email'])
 @Entity('client_info')
 export class ClientInfo extends BasicInformationEntity{
 

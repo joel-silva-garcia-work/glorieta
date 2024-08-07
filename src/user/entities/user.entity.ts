@@ -30,6 +30,7 @@ export class User extends BasicEntity {
   phone: string;
 
   @OneToMany(() => UserRole,(userRoles)=> userRoles.user,{
+    eager: true,
     cascade: true
   })
   userRoles: UserRole[]
