@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BaseServiceCRUD } from 'src/common/base/class/base.service.crud.class';
 import { Repository } from 'typeorm';
 import { Municipality } from './entities/municipality.entity';
+import { MunicipalitySearchDto } from './dto/municipality-search.dto';
 @Injectable()
 export class MunicipalityService extends BaseServiceCRUD<Municipality,CreateMunicipalityDto,UpdateMunicipalityDto> {
   constructor(
@@ -12,5 +13,21 @@ export class MunicipalityService extends BaseServiceCRUD<Municipality,CreateMuni
     private readonly repository: Repository<Municipality>,
   ) {
     super(repository)
+  }
+
+  async findItems(searchDto: MunicipalitySearchDto): Promise<Municipality[]> {
+    const queryBuilder = this.repository.createQueryBuilder('municipality')
+      .leftJoinAndSelect('municipality.province', 'province');
+
+    if (searchDto.name) {
+      queryBuilder.andWhere('municipality.name LIKE :name', { name: `%${searchDto.name}%` });
+    }
+    if (searchDto.provinceId) {
+      queryBuilder.andWhere('municipality.provinceId = :provinceId', { provinceId: searchDto.provinceId });
+    }
+    if (searchDto.provinceName) {
+      queryBuilder.andWhere('province.name LIKE :provinceName', { provinceName: `%${searchDto.provinceName}%` });
+    }
+    return queryBuilder.getMany();
   }
 }

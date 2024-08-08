@@ -35,6 +35,7 @@ import { ShopModule } from './shop/shop.module';
 import { ShopSectionProductsModule } from './shop-section-products/shop-section-products.module';
 import { ShopSectionsModule } from './shop-sections/shop-sections.module';
 import { StateOrderModule } from './state-order/state-order.module';
+import { TipoCambioModule } from './tipo-cambio/tipo-cambio.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { StateOrderModule } from './state-order/state-order.module';
     ShopSectionProductsModule,
     ShopSectionsModule,
     StateOrderModule,
+    TipoCambioModule,
   ],
   controllers: [],
   providers: [GlobalesService],
