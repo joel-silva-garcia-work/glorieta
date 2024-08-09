@@ -1,8 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, IsBoolean, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsUUID, IsNotEmpty } from 'class-validator';
+import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 export class CreateMunicipalityDto {
 
+  @IsUUID()
+  @IsString()
+  @IsOptional()
+  id?: string;
+  
   @ApiProperty()
   @IsString()
   name: string
@@ -14,6 +20,10 @@ export class CreateMunicipalityDto {
 
   @ApiProperty()
   @IsString()
-  provinceId: string;
+  province_id: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  rules: RulesDto
 
 }

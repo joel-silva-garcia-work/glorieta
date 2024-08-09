@@ -8,7 +8,7 @@ import { ConfigSearchDto } from './dto/config-search.dto';
 import { Configuracion } from './entities/configuracion.entity';
 
 @ApiTags('Configuracion')
-@Controller('configuraciones')
+@Controller('configuracion')
 export class ConfiguracionController extends BaseControllerCRUD<CreateConfiguracionDto,UpdateConfiguracionDto,ConfiguracionService>{
   constructor(private readonly Service: ConfiguracionService) {
     super(Service)

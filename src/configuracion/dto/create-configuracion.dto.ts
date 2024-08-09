@@ -1,23 +1,30 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsUUID } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { RulesDto } from 'src/common/base/dto/rules.dto';
 export class CreateConfiguracionDto {
   
 
-    @ApiProperty()
-    @IsUUID()
-    @IsString()
-  id: string;
+  @ApiPropertyOptional()
+  @IsUUID()
+  @IsString()
+  @IsOptional()
+  id?: string;
 
 
   @ApiProperty()
   @IsUUID()
   @IsString()
-  sellCurrencyId: string;
+  sellCurrency: string;
 
 
   @ApiProperty()
   @IsUUID()
   @IsString()
-  deliveryCurrencyId: string;
+  deliveryCurrency: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  rules: RulesDto
+  // aqui agregar codigo para que el sistema valide que sellCurrency no sea igual a deliveryCurrency
 }
 

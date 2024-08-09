@@ -1,7 +1,15 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsInt } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsInt, IsUUID, IsOptional, IsNotEmpty } from 'class-validator';
+import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 export class CreateCountryDto {
+
+  @ApiPropertyOptional()
+  @IsUUID()
+  @IsString()
+  @IsOptional()
+  id?: string;
+  
   @ApiProperty()
   @IsString()
   name: string;
@@ -17,4 +25,8 @@ export class CreateCountryDto {
   @ApiProperty()
   @IsInt()
   numericCode: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  rules: RulesDto
 }

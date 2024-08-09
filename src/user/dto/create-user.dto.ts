@@ -3,6 +3,11 @@ import { IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, IsStrongPassw
 
 export class CreateUserDto {
 
+  @IsUUID()
+  @IsString()
+  @IsOptional()
+  id?: string;
+  
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

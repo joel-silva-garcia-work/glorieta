@@ -1,26 +1,31 @@
-import { IsString, IsUUID, IsDecimal } from 'class-validator';
+import { IsString, IsUUID, IsDecimal, IsOptional, IsNotEmpty } from 'class-validator';
+import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 export class CreateProductDto {
     
-      @IsUUID()
-      id: string;
+  @IsUUID()
+  @IsString()
+  @IsOptional()
+  id?: string;
     
-      @IsString()
-      name: string;
-    
-      @IsUUID()
-      marcaId: string;
-    
-      @IsUUID()
-      modeloId: string;
-    
-      @IsString()
-      descripcion: string;
-    
-      @IsString()
-      photo: string;
-    
-      @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
-      price: number;
-    }
-    
+  @IsString()
+  name: string;
+
+  @IsUUID()
+  marca: string;
+
+  @IsUUID()
+  modelo: string;
+
+  @IsString()
+  description: string;
+
+  @IsString()
+  photo: string;
+
+  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
+  price: number;
+
+  @IsNotEmpty()
+  rules: RulesDto 
+}

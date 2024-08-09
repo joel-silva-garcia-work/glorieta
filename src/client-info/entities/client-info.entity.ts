@@ -8,8 +8,6 @@ import { v4 } from 'uuid'
 @Entity('client_info')
 export class ClientInfo extends BasicInformationEntity{
 
-
-
   @Column({ type: 'varchar', length: 255 })
   email: string;
 

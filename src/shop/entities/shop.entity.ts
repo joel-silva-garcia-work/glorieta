@@ -6,10 +6,10 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Unique } from 'typeo
 @Unique('uk_name_shop', ['name'])
 export class Shop  extends BasicInformationEntity {
 
-  @Column({ type: 'int' })
+  @Column({ type: 'decimal', precision: 6, scale: 2 })
   longitud: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'decimal', precision: 6, scale: 2 })
   latitud: number;
 
   @Column({ type: 'varchar', length: 255 })

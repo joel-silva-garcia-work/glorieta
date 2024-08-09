@@ -44,7 +44,8 @@ export class BaseServiceCRUD<TEntity,createDto extends BaseDto,updateDto extends
     if (createDto.rules) {
       this.valid = await this._validate(createDto);
     }
-    else{
+    else
+    {
       this.valid = true
     }
     if (this.valid) {
@@ -142,7 +143,7 @@ export class BaseServiceCRUD<TEntity,createDto extends BaseDto,updateDto extends
     return this.returnDto;
   }
 
-
+  
 private sortJson(data: any[], orderBy: OrderDto[]): any[] {
   return data.sort((a, b) => {
     for (const { field, order } of orderBy) {

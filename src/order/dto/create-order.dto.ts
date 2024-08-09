@@ -3,7 +3,9 @@ import { IsString, IsUUID, IsDecimal, IsNumber, IsOptional } from 'class-validat
 export class CreateOrderDto {
 
   @IsUUID()
-  id: string;
+  @IsString()
+  @IsOptional()
+  id?: string;
 
   @IsString()
   noOrden: string;

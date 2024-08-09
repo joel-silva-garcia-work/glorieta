@@ -9,7 +9,8 @@ export class UpdateModeloDto extends PartialType(CreateModeloDto) {
   @ApiProperty()
   @IsString()
   @IsUUID()
-  id: string; 
+  id: string;
+   
   rules: RulesDto = {
     method: MethodEnum.UPDATE,
     comparisonKind: KindEnum.UINQUE,

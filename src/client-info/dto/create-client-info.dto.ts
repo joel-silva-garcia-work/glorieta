@@ -1,12 +1,24 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsUUID, IsBoolean, IsNotEmpty } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsEmail, IsUUID, IsBoolean, IsNotEmpty, IsOptional } from 'class-validator';
+import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 export class ClientInfoCreateDTO {
-  
+
+  @ApiPropertyOptional()
+  @IsUUID()
+  @IsString()
+  @IsOptional()
+  id?: string;
+
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  nombre: string;
+  name: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  description: string;
 
   @ApiProperty()
   @IsEmail()
@@ -26,8 +38,14 @@ export class ClientInfoCreateDTO {
   @IsNotEmpty()
   municipalityId: string;
 
-//   @ApiProperty()
-//   @IsBoolean()
-//   @IsNotEmpty()
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
   actual?: boolean = true; // Optional, default is true
+  
+  @ApiProperty({
+    type:RulesDto
+  })
+  @IsNotEmpty()
+rules: RulesDto 
 }

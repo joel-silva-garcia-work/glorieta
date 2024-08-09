@@ -1,8 +1,11 @@
-import { IsString, IsUUID } from 'class-validator';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 export class CreateStateOrderDto {
- @IsUUID()
-  id: string;
 
+  @IsUUID()
+  @IsString()
+  @IsOptional()
+  id?: string;
+  
   @IsString()
   name: string;
 }

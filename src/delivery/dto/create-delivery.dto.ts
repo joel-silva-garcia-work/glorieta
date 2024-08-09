@@ -1,22 +1,35 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID, IsDecimal, IsNumber } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsUUID, IsDecimal, IsNumber, IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 export class CreateDeliveryDto {
 
+  @ApiPropertyOptional()
   @IsUUID()
-  @ApiProperty()
-  id: string;
+  @IsString()
+  @IsOptional()
+  id?: string;
 
   @ApiProperty()
   @IsUUID()
-  municipalityOriginId: string;
+  municipalityOrigin: string;
 
   @ApiProperty()
   @IsUUID()
-  municipalityDestinyId: string;
+  municipalityDestiny: string;
 
   @ApiProperty()
   @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
   price: number;
+
+  @ApiProperty()
+  @IsUUID()
+  deliveryStateId: string;
+  
+  @ApiProperty({
+    type:RulesDto
+  })
+  @IsNotEmpty()
+rules: RulesDto 
 }
 

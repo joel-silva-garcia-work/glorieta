@@ -1,19 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { RulesDto } from '../../common/base/dto/rules.dto';
-import { KindEnum } from '../../common/enum/kind.enum';
-import { MethodEnum } from '../../common/enum/method.enum';
-import { IsOptional, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateSectionDto {
+
   @IsUUID()
+  @IsString()
   @IsOptional()
   id?: string;
+  
   @ApiProperty()
   name: string;
+    
+  @ApiProperty()
+  description: string;
 
-  rules: RulesDto = {
-    method: MethodEnum.CREATE,
-    comparisonKind: KindEnum.UINQUE,
-    field: ['name'],
-  };
+  @ApiProperty()
+  @IsNotEmpty()
+  rules: RulesDto
 }

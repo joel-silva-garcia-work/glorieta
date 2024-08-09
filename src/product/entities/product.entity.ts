@@ -14,9 +14,6 @@ export class Product extends BasicInformationEntity {
   modelo: Modelo;
 
   @Column({ type: 'text' })
-  descripcion: string;
-
-  @Column({ type: 'text' })
   photo: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
