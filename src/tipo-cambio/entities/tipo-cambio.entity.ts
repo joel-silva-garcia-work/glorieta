@@ -1,10 +1,10 @@
 import { BasicEntity } from "src/common/base/entities";
 import { Currency } from "src/currency/entities/currency.entity";
-import { Column, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
 
+@Entity("tipo-cambio") 
 export class TipoCambio extends BasicEntity {
 
-  
     @ManyToOne(() => Currency, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
     baseCurrency: Currency;
   

@@ -1,17 +1,18 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsDateString, IsOptional, IsString, IsUUID, Matches } from "class-validator";
+import { IsDate, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Matches } from "class-validator";
+import { RulesDto } from "src/common/base/dto/rules.dto";
 
 export class CreateTipoCambioDto {
 
     @ApiProperty()
     @IsString()
     @IsUUID()
-    baseCurrencyId: string;
+    baseCurrency: string;
 
     @ApiProperty()
     @IsString()
     @IsUUID()
-    exchageCurrencyId: string;
+    exchangeCurrency: string;
 
     @ApiProperty()
     @IsDate() 
@@ -22,5 +23,12 @@ export class CreateTipoCambioDto {
     @IsOptional()
     fecha: Date;
 
+    @ApiProperty()
+    @IsNumber() 
+    exchangeRate: number
 
+    @ApiProperty()
+    @IsNotEmpty()
+    rules: RulesDto 
 }
+  
