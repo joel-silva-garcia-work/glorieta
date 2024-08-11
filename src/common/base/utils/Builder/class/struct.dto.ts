@@ -20,5 +20,4 @@ export class StructDto {
     default: 'none',
   })
   alias: string;
-
 }

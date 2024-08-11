@@ -6,11 +6,13 @@ import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-sec
 
 @Entity('order_product_delivery')
 export class OrderProductDelivery extends BasicEntity {
-  
   @ManyToOne(() => Order, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
   order: Order;
 
-  @ManyToOne(() => ShopSectionProducts, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+  @ManyToOne(() => ShopSectionProducts, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
   shopSectionProduct: ShopSectionProducts;
 
   @Column({ type: 'int', nullable: true })
@@ -22,7 +24,10 @@ export class OrderProductDelivery extends BasicEntity {
   @Column({ type: 'varchar', length: 10 })
   fechaEntrega: string;
 
-  @ManyToOne(() => DeliveryState, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+  @ManyToOne(() => DeliveryState, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
   deliveryState: DeliveryState;
 
   @Column({ type: 'boolean', default: true })

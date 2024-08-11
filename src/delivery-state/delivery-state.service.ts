@@ -8,19 +8,25 @@ import { DeliveryState } from './entities/delivery-state.entity';
 import { DeliveryStateSearchDto } from './dto/delivery-state-search.dto';
 
 @Injectable()
-export class DeliveryStateService extends BaseServiceCRUD<DeliveryState,CreateDeliveryStateDto,UpdateDeliveryStateDto> {
+export class DeliveryStateService extends BaseServiceCRUD<
+  DeliveryState,
+  CreateDeliveryStateDto,
+  UpdateDeliveryStateDto
+> {
   constructor(
     @InjectRepository(DeliveryState)
     private readonly repository: Repository<DeliveryState>,
   ) {
-    super(repository)
+    super(repository);
   }
 
   async findItems(searchDto: DeliveryStateSearchDto): Promise<DeliveryState[]> {
     const queryBuilder = this.repository.createQueryBuilder('deliveryState');
 
     if (searchDto.name) {
-      queryBuilder.andWhere('deliveryState.name LIKE :name', { name: `%${searchDto.name}%` });
+      queryBuilder.andWhere('deliveryState.name LIKE :name', {
+        name: `%${searchDto.name}%`,
+      });
     }
 
     return queryBuilder.getMany();

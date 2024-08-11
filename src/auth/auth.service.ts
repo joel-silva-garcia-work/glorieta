@@ -82,7 +82,7 @@ export class AuthService {
     });
     user = await this.userRepository.save(user);
     // return the save user token
-    return this.signToken(user.id, user.username);// user.userRoles
+    return this.signToken(user.id, user.username); // user.userRoles
   }
 
   async signup(dto: AuthDto) {

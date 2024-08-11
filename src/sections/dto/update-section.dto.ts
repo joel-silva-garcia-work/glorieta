@@ -5,7 +5,7 @@ import { KindEnum } from '../../common/enum/kind.enum';
 import { MethodEnum } from '../../common/enum/method.enum';
 import { IsString, IsUUID } from 'class-validator';
 
-export class UpdateSectionDto extends PartialType(CreateSectionDto,) {
+export class UpdateSectionDto extends PartialType(CreateSectionDto) {
   @ApiProperty()
   @IsString()
   @IsUUID()

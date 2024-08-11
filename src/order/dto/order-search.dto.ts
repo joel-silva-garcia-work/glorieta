@@ -1,5 +1,13 @@
 // src/order/dto/order-search.dto.ts
-import { IsOptional, IsString, IsUUID, IsNumber, IsDecimal, IsArray, IsDateString } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsUUID,
+  IsNumber,
+  IsDecimal,
+  IsArray,
+  IsDateString,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class OrderSearchDto {
@@ -39,12 +47,6 @@ export class OrderSearchDto {
   @IsString()
   readonly fechaOrder?: string;
 
-
- 
- 
-
- 
-
   @IsOptional()
   @IsNumber()
   readonly deliveryTravelsGreaterThan?: number;
@@ -69,5 +71,4 @@ export class OrderSearchDto {
   @IsArray()
   @Type(() => String)
   readonly fechaOrderBetween?: [string, string]; // Should be ISO date strings
-
 }

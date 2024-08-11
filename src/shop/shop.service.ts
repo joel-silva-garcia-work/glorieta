@@ -7,11 +7,15 @@ import { Repository } from 'typeorm';
 import { Shop } from './entities/shop.entity';
 
 @Injectable()
-export class ShopService extends BaseServiceCRUD<Shop,CreateShopDto,UpdateShopDto> {
+export class ShopService extends BaseServiceCRUD<
+  Shop,
+  CreateShopDto,
+  UpdateShopDto
+> {
   constructor(
     @InjectRepository(Shop)
     private readonly repository: Repository<Shop>,
   ) {
-    super(repository)
+    super(repository);
   }
 }

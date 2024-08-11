@@ -1,7 +1,14 @@
-
-import { IsString, IsUUID, IsDecimal, IsNumber, IsOptional } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsString,
+  IsUUID,
+  IsDecimal,
+  IsNumber,
+  IsOptional,
+  IsNotEmpty,
+} from 'class-validator';
+import { RulesDto } from 'src/common/base/dto/rules.dto';
 export class CreateOrderDto {
-
   @IsUUID()
   @IsString()
   @IsOptional()
@@ -34,5 +41,8 @@ export class CreateOrderDto {
   @IsOptional()
   @IsString()
   fechaOrder?: string;
-}
 
+  @ApiProperty()
+  @IsNotEmpty()
+  rules: RulesDto;
+}

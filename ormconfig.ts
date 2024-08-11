@@ -8,7 +8,6 @@ import { Modelo } from './src/modelos/entities/modelo.entity';
 import { Country } from './src/country/entities/country.entity';
 import { Province } from './src/province/entities/province.entity';
 import { Municipality } from './src/municipality/entities/municipality.entity';
-import { Locality } from './src/locality/entities/locality.entity';
 import { UserRole } from './src/user-roles/entities/user-role.entity';
 import { Configuracion } from './src/configuracion/entities/configuracion.entity';
 import { Traza } from 'src/trazas/entities/traza.entity';
@@ -24,7 +23,6 @@ import { RejectOrder } from 'src/reject-order/entities/reject-order.entity';
 import { Shop } from 'src/shop/entities/shop.entity';
 import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-section-product.entity';
 import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
-import { StateOrder } from 'src/state-order/entities/state-order.entity';
 import { TipoCambio } from 'src/tipo-cambio/entities/tipo-cambio.entity';
 
 dotenv.config(); // Carga las variables de entorno desde el archivo .env
@@ -49,7 +47,6 @@ export const config: TypeOrmModuleOptions = {
     Country,
     Province,
     Municipality,
-    Locality,
     Configuracion,
     Currency,
     ClientInfo,
@@ -64,8 +61,7 @@ export const config: TypeOrmModuleOptions = {
     Shop,
     ShopSectionProducts,
     ShopSections,
-    StateOrder,
-    TipoCambio
+    TipoCambio,
   ],
   // entities: [__dirname + '/**/*.entity{.ts,.js}'],
   migrations: ['src/database/migrations/*.ts'],

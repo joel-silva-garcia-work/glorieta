@@ -4,7 +4,7 @@
 <html lang="es">
 <head>
     <!-- Configura tus metadatos y estilos aquí -->
-</head>
+    <title></title></head>
 <body>
     <h1>Lista de Marcas</h1>
     <table>
@@ -12,13 +12,13 @@
         <% marcas.data.forEach(marca => { %>
             <tr>
                 <td><%= marca.id %></td>
-                <td><%= marca.nombre %></td>
-                <td><%= marca.descripcion %></td>
+                <td><%= marca.name %></td>
+                <td><%= marca.description %></td>
             </tr>
         <% }); %>
     </table>
     <!-- Agrega un formulario para filtrar las marcas -->
-    <form action="/marca" method="get">
+    <form action="/marcas/listar" method="get">
         <input type="hidden" name="queryType" value="one">
         <input type="hidden" name="page" value= 0>
         <input type="hidden" name="limit" value= 3>

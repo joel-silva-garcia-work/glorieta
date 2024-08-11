@@ -1,13 +1,18 @@
-import { IsString, IsUUID, IsDecimal, IsOptional, IsNotEmpty } from 'class-validator';
+import {
+  IsString,
+  IsUUID,
+  IsDecimal,
+  IsOptional,
+  IsNotEmpty,
+} from 'class-validator';
 import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 export class CreateProductDto {
-    
   @IsUUID()
   @IsString()
   @IsOptional()
   id?: string;
-    
+
   @IsString()
   name: string;
 
@@ -27,5 +32,5 @@ export class CreateProductDto {
   price: number;
 
   @IsNotEmpty()
-  rules: RulesDto 
+  rules: RulesDto;
 }

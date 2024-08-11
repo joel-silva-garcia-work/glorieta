@@ -37,7 +37,6 @@ export class UserService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
   }
-  // validador para email
   async findOneByEmail(userEmail: string): Promise<User> {
     try {
       const user = await this.userRepository.findOneOrFail({

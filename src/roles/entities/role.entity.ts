@@ -9,14 +9,12 @@ name unico
 @Entity('roles')
 export class Role extends BasicEntity {
   @Column()
-  name: string
+  name: string;
   @Column()
-  description: string
+  description: string;
 
-
-  @OneToMany(() => UserRole,(userRoles)=> userRoles.role,{
-    cascade: true
+  @OneToMany(() => UserRole, (userRoles) => userRoles.role, {
+    cascade: true,
   })
-  userRoles: UserRole[]
-
+  userRoles: UserRole[];
 }

@@ -8,33 +8,48 @@ import { Repository } from 'typeorm';
 import { ConfigSearchDto } from './dto/config-search.dto';
 
 @Injectable()
-export class ConfiguracionService extends BaseServiceCRUD<Configuracion,CreateConfiguracionDto,UpdateConfiguracionDto> {
+export class ConfiguracionService extends BaseServiceCRUD<
+  Configuracion,
+  CreateConfiguracionDto,
+  UpdateConfiguracionDto
+> {
   constructor(
     @InjectRepository(Configuracion)
     private readonly repository: Repository<Configuracion>,
   ) {
-    super(repository)
+    super(repository);
   }
 
   async findItems(searchDto: ConfigSearchDto): Promise<Configuracion[]> {
-    const queryBuilder = this.repository.createQueryBuilder('configuracion')
+    const queryBuilder = this.repository
+      .createQueryBuilder('configuracion')
       .leftJoinAndSelect('configuracion.sellCurrency', 'sellCurrency')
       .leftJoinAndSelect('configuracion.deliveryCurrency', 'deliveryCurrency');
 
     if (searchDto.sellCurrencyId) {
-      queryBuilder.andWhere('configuracion.sellCurrencyId = :sellCurrencyId', { sellCurrencyId: searchDto.sellCurrencyId });
+      queryBuilder.andWhere('configuracion.sellCurrencyId = :sellCurrencyId', {
+        sellCurrencyId: searchDto.sellCurrencyId,
+      });
     }
 
     if (searchDto.deliveryCurrencyId) {
-      queryBuilder.andWhere('configuracion.deliveryCurrencyId = :deliveryCurrencyId', { deliveryCurrencyId: searchDto.deliveryCurrencyId });
+      queryBuilder.andWhere(
+        'configuracion.deliveryCurrencyId = :deliveryCurrencyId',
+        { deliveryCurrencyId: searchDto.deliveryCurrencyId },
+      );
     }
 
     if (searchDto.sellCurrencyName) {
-      queryBuilder.andWhere('sellCurrency.name LIKE :sellCurrencyName', { sellCurrencyName: `%${searchDto.sellCurrencyName}%` });
+      queryBuilder.andWhere('sellCurrency.name LIKE :sellCurrencyName', {
+        sellCurrencyName: `%${searchDto.sellCurrencyName}%`,
+      });
     }
 
     if (searchDto.deliveryCurrencyName) {
-      queryBuilder.andWhere('deliveryCurrency.name LIKE :deliveryCurrencyName', { deliveryCurrencyName: `%${searchDto.deliveryCurrencyName}%` });
+      queryBuilder.andWhere(
+        'deliveryCurrency.name LIKE :deliveryCurrencyName',
+        { deliveryCurrencyName: `%${searchDto.deliveryCurrencyName}%` },
+      );
     }
 
     return queryBuilder.getMany();

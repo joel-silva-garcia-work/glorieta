@@ -16,8 +16,8 @@ export class SearchDto {
   @IsOptional()
   @ApiPropertyOptional({
     type: [SearchFieldDto],
-    isArray: true
-    })
+    isArray: true,
+  })
   fields?: SearchFieldDto[];
 
   @IsInt()
@@ -38,7 +38,7 @@ export class SearchDto {
   @ApiPropertyOptional({
     type: () => [ConditionDto],
     isArray: true,
-    default: []
+    default: [],
   })
   conditions?: ConditionDto[];
 
@@ -46,7 +46,7 @@ export class SearchDto {
   @ApiPropertyOptional({
     type: () => [StructDto],
     isArray: true,
-    default: []
+    default: [],
   })
   relations?: StructDto[];
 

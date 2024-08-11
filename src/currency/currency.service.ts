@@ -7,27 +7,33 @@ import { Repository } from 'typeorm';
 import { Currency } from './entities/currency.entity';
 import { CurrencySearchDto } from './dto/currency-search.dto';
 
-
 @Injectable()
-export class CurrencyService extends BaseServiceCRUD<Currency,CreateCurrencyDto,UpdateCurrencyDto> {
+export class CurrencyService extends BaseServiceCRUD<
+  Currency,
+  CreateCurrencyDto,
+  UpdateCurrencyDto
+> {
   constructor(
     @InjectRepository(Currency)
     private readonly repository: Repository<Currency>,
   ) {
-    super(repository)
+    super(repository);
   }
   async findItems(searchDto: CurrencySearchDto): Promise<Currency[]> {
     const queryBuilder = this.repository.createQueryBuilder('currency');
 
     if (searchDto.currency) {
-      queryBuilder.andWhere('currency.currency LIKE :currency', { currency: `%${searchDto.currency}%` });
+      queryBuilder.andWhere('currency.currency LIKE :currency', {
+        currency: `%${searchDto.currency}%`,
+      });
     }
 
     if (searchDto.name) {
-      queryBuilder.andWhere('currency.name LIKE :name', { name: `%${searchDto.name}%` });
+      queryBuilder.andWhere('currency.name LIKE :name', {
+        name: `%${searchDto.name}%`,
+      });
     }
 
     return queryBuilder.getMany();
   }
-  
 }

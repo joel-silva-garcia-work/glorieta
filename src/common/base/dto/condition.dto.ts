@@ -10,19 +10,19 @@ export class ConditionDto {
   field: string;
 
   @ApiProperty({
-    default: EnumTypeOf.STRING
+    default: EnumTypeOf.STRING,
   })
   @IsEnum(EnumTypeOf)
-  fieldType: EnumTypeOf = EnumTypeOf.STRING
+  fieldType: EnumTypeOf = EnumTypeOf.STRING;
 
   @ApiPropertyOptional({
-    type: String
+    type: String,
   })
   @IsString()
   @IsOptional()
-  objectIndex?: string 
+  objectIndex?: string;
   @ApiProperty()
-  value: any | Date | boolean | string  | [];
+  value: any | Date | boolean | string | [];
   @ApiProperty()
-  operator: LogicalOperators
+  operator: LogicalOperators;
 }

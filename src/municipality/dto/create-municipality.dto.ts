@@ -3,20 +3,18 @@ import { IsString, IsOptional, IsUUID, IsNotEmpty } from 'class-validator';
 import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 export class CreateMunicipalityDto {
-
   @IsUUID()
   @IsString()
   @IsOptional()
   id?: string;
-  
-  @ApiProperty()
-  @IsString()
-  name: string
-
 
   @ApiProperty()
   @IsString()
-  description: string
+  name: string;
+
+  @ApiProperty()
+  @IsString()
+  description: string;
 
   @ApiProperty()
   @IsString()
@@ -24,6 +22,5 @@ export class CreateMunicipalityDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  rules: RulesDto
-
+  rules: RulesDto;
 }

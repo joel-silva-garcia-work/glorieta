@@ -1,5 +1,4 @@
 import { ExtendedEntity } from 'src/common/base/entities';
-import { Locality } from 'src/locality/entities/locality.entity';
 import { Province } from 'src/province/entities/province.entity';
 import {
   Column,
@@ -18,9 +17,6 @@ export class Municipality extends ExtendedEntity {
   @JoinColumn({ name: 'province_id' })
   province: Province;
 
-  @OneToMany(() => Locality, (locality) => locality.municipality, {
-    cascade: false,
-  })
-  localities: Locality[];
+  
 
 }

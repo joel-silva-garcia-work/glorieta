@@ -15,10 +15,14 @@ import { BaseControllerCRUD } from 'src/common/base/class/base.controller.crud.c
 import { Province } from './entities/province.entity';
 @ApiTags('Province')
 @Controller('province')
-export class ProvinceController extends BaseControllerCRUD<CreateProvinceDto,UpdateProvinceDto,ProvinceService>{
+export class ProvinceController extends BaseControllerCRUD<
+  CreateProvinceDto,
+  UpdateProvinceDto,
+  ProvinceService
+> {
   constructor(private readonly Service: ProvinceService) {
-    super(Service)
-  }  
+    super(Service);
+  }
   // @Get()
   // async findItems(@Query() searchDto: Province): Promise<Province[]> {
   //   return this.Service.findItems(searchDto);

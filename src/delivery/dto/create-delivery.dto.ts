@@ -1,9 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsUUID, IsDecimal, IsNumber, IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import {
+  IsUUID,
+  IsDecimal,
+  IsNumber,
+  IsString,
+  IsOptional,
+  IsNotEmpty,
+} from 'class-validator';
 import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 export class CreateDeliveryDto {
-
   @ApiPropertyOptional()
   @IsUUID()
   @IsString()
@@ -25,11 +31,10 @@ export class CreateDeliveryDto {
   @ApiProperty()
   @IsUUID()
   deliveryStateId: string;
-  
+
   @ApiProperty({
-    type:RulesDto
+    type: RulesDto,
   })
   @IsNotEmpty()
-rules: RulesDto 
+  rules: RulesDto;
 }
-

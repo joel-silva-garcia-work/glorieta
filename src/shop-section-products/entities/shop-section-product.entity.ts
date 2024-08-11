@@ -4,8 +4,7 @@ import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity('shop_section_products')
-export class ShopSectionProducts  extends BasicEntity {
-  
+export class ShopSectionProducts extends BasicEntity {
   @ManyToOne(() => ShopSections, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
   shopSection: ShopSections;
 

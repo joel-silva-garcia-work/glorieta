@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { CurrencyService } from './currency.service';
 import { CreateCurrencyDto } from './dto/create-currency.dto';
 import { UpdateCurrencyDto } from './dto/update-currency.dto';
@@ -9,12 +18,16 @@ import { Currency } from './entities/currency.entity';
 
 @ApiTags('Currency')
 @Controller('currency')
-export class CurrencyController extends BaseControllerCRUD<CreateCurrencyDto,UpdateCurrencyDto,CurrencyService>{
+export class CurrencyController extends BaseControllerCRUD<
+  CreateCurrencyDto,
+  UpdateCurrencyDto,
+  CurrencyService
+> {
   constructor(private readonly Service: CurrencyService) {
-    super(Service)
-  } 
+    super(Service);
+  }
   @Get()
   async findItems(@Query() searchDto: CurrencySearchDto): Promise<Currency[]> {
     return this.Service.findItems(searchDto);
-  } 
+  }
 }

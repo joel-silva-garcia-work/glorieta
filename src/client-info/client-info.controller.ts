@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ClientInfoService } from './client-info.service';
 import { ClientInfoCreateDTO } from './dto/create-client-info.dto';
 import { UpdateClientInfoDto } from './dto/update-client-info.dto';
@@ -9,12 +18,18 @@ import { ClientInfo } from './entities/client-info.entity';
 
 @ApiTags('Client-Info')
 @Controller('client-info')
-export class ClientInfoController extends BaseControllerCRUD<ClientInfoCreateDTO,UpdateClientInfoDto,ClientInfoService>{
+export class ClientInfoController extends BaseControllerCRUD<
+  ClientInfoCreateDTO,
+  UpdateClientInfoDto,
+  ClientInfoService
+> {
   constructor(private readonly Service: ClientInfoService) {
-    super(Service)
-  }  
+    super(Service);
+  }
   @Get()
-  async findItems(@Query() searchDto: ClientInfoSearchDto): Promise<ClientInfo[]> {
+  async findItems(
+    @Query() searchDto: ClientInfoSearchDto,
+  ): Promise<ClientInfo[]> {
     return this.Service.findItems(searchDto);
   }
 }

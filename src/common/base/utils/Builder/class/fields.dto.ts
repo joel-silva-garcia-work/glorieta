@@ -7,7 +7,6 @@ import {
   ValueType,
 } from '../enum';
 
-
 export class SearchFieldDto {
   @ApiProperty()
   alias: string;
@@ -31,7 +30,6 @@ export class DataFields {
 }
 
 export class FieldDto extends SearchFieldDto {
-
   @ApiPropertyOptional()
   conditionalOperator: ConditionalOperators;
   @ApiPropertyOptional()

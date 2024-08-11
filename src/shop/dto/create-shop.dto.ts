@@ -15,11 +15,8 @@ export class CreateShopDto {
   @IsString()
   description: string;
 
-  @IsNumber()
-  longitud: number;
-
-  @IsNumber()
-  latitud: number;
+  @IsString()
+  photo: string;
 
   @IsString()
   phone: string;

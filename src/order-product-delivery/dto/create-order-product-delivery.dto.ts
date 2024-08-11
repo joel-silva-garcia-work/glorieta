@@ -1,7 +1,13 @@
-import { IsUUID, IsDecimal, IsNumber, IsBoolean, IsString, IsOptional } from 'class-validator';
+import {
+  IsUUID,
+  IsDecimal,
+  IsNumber,
+  IsBoolean,
+  IsString,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateOrderProductDeliveryDto {
-
   @IsUUID()
   @IsString()
   @IsOptional()
@@ -28,4 +34,3 @@ export class CreateOrderProductDeliveryDto {
   @IsBoolean()
   toDelivery: boolean;
 }
-    

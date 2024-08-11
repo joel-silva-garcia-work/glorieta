@@ -22,10 +22,10 @@ export const GetUserAdmin = createParamDecorator(
     const user: Partial<User> = request.user;
     // Verifica si el ID del rol del usuario es 1
     // if (user && user.role.id === 1) {
-      return user;
-  //   }
-  //   // return null to try catch the null object in the method
-  //   return null;
+    return user;
+    //   }
+    //   // return null to try catch the null object in the method
+    //   return null;
   },
 );
 
@@ -36,9 +36,9 @@ export const GetUserEmployee = createParamDecorator(
 
     // Verifica si el ID del rol del usuario es 2
     // if (user && user.role.id === 2) {
-      return user;
+    return user;
     // } else {
-      // throw new ConflictException('El usuario no es empleado.');
+    // throw new ConflictException('El usuario no es empleado.');
     // }
   },
 );
@@ -49,9 +49,9 @@ export const GetUserClient = createParamDecorator(
     const user: Partial<User> = request.user;
     // Verifica si el ID del rol del usuario es 3
     // if (user && user.role.id === 3) {
-      return user;
+    return user;
     // } else {
-      // throw new ConflictException('El usuario no es cliente.');
+    // throw new ConflictException('El usuario no es cliente.');
     // }
   },
 );

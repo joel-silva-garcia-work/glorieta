@@ -1,16 +1,11 @@
-import {
-  Entity,
-  Column,
-  OneToMany,
-} from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { UserRole } from 'src/user-roles/entities/user-role.entity';
 import { BasicEntity } from 'src/common/base/entities/basic.entity';
-
 
 @Entity('users')
 export class User extends BasicEntity {
   @Column()
-  name: string
+  name: string;
   @Column({ nullable: false })
   hash: string;
 
@@ -29,9 +24,9 @@ export class User extends BasicEntity {
   @Column({ nullable: true })
   phone: string;
 
-  @OneToMany(() => UserRole,(userRoles)=> userRoles.user,{
+  @OneToMany(() => UserRole, (userRoles) => userRoles.user, {
     eager: true,
-    cascade: true
+    cascade: true,
   })
-  userRoles: UserRole[]
+  userRoles: UserRole[];
 }

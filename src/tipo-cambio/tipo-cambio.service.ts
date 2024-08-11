@@ -6,11 +6,15 @@ import { BaseServiceCRUD } from 'src/common/base/class/base.service.crud.class';
 import { Repository } from 'typeorm';
 import { TipoCambio } from './entities/tipo-cambio.entity';
 @Injectable()
-export class TipoCambioService extends BaseServiceCRUD<TipoCambio,CreateTipoCambioDto,UpdateTipoCambioDto> {
+export class TipoCambioService extends BaseServiceCRUD<
+  TipoCambio,
+  CreateTipoCambioDto,
+  UpdateTipoCambioDto
+> {
   constructor(
     @InjectRepository(TipoCambio)
     private readonly repository: Repository<TipoCambio>,
   ) {
-    super(repository)
+    super(repository);
   }
 }
