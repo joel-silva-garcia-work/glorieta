@@ -63,7 +63,6 @@ export const config: TypeOrmModuleOptions = {
     ShopSectionProducts,
     ShopSections,
     TipoCambio,
-    TiendaSeccionProductoMarcaModeloView,
   ],
   // entities: [__dirname + '/**/*.entity{.ts,.js}'],
   migrations: ['src/database/migrations/*.ts'],

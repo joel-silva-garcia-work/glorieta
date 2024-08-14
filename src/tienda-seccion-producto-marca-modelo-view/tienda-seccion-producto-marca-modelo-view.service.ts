@@ -5,7 +5,7 @@ import { SearchTiendaSeccionProductoMarcaModeloDto } from './dto/search-tienda-s
 import { TiendaSeccionProductoMarcaModeloView } from './entities/tienda-seccion-producto-marca-modelo-view.entity';
 
 @Injectable()
-export class TiendaService {
+export class TiendaSeccionProductoMarcaModeloViewService {
   constructor(
     @InjectRepository(TiendaSeccionProductoMarcaModeloView)
     private readonly tiendaRepository: Repository<TiendaSeccionProductoMarcaModeloView>,
