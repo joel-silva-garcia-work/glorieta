@@ -4,8 +4,11 @@ import {
   IsDecimal,
   IsOptional,
   IsNotEmpty,
+  IsArray,
 } from 'class-validator';
 import { RulesDto } from 'src/common/base/dto/rules.dto';
+import { UbicacionProductDto } from './ubicacion-producto.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProductDto {
   @IsUUID()
@@ -28,9 +31,12 @@ export class CreateProductDto {
   @IsString()
   photo: string;
 
-  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
-  price: number;
-
+  @IsArray()
+  @ApiProperty({
+    type:[UbicacionProductDto],
+    isArray: true
+  })
+  ubicacion: [UbicacionProductDto]
   @IsNotEmpty()
   rules: RulesDto;
 }

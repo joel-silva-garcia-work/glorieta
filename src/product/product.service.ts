@@ -12,6 +12,8 @@ import { ReturnDto } from 'src/common/base/dto';
 import { CodeEnum } from 'src/common/enum/code.enum';
 import { ResourceEnum } from 'src/common/enum/resource.enum';
 import { v4 as uuidv4 } from 'uuid';
+import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-section-product.entity';
+import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
 
 @Injectable()
 export class ProductService extends BaseServiceCRUD<
@@ -25,6 +27,10 @@ export class ProductService extends BaseServiceCRUD<
   constructor(
     @InjectRepository(Product)
     private readonly repository: Repository<Product>,
+    @InjectRepository(ShopSections)
+    private readonly shopSectionsRepository: Repository<ShopSections>,
+    @InjectRepository(ShopSectionProducts)
+    private readonly shopSectionProductRepository: Repository<ShopSectionProducts>,
   ) {
     super(repository);
   }
@@ -42,13 +48,38 @@ export class ProductService extends BaseServiceCRUD<
 
         product.description = createDto.description;
         product.name = createDto.name;
-        product.price = createDto.price;
         product.marca = createDto.marca as any;
         product.modelo = createDto.modelo as any;
 
         product.photo = await this.saveProductImage(createDto.photo);
 
         returnDto.data = await this.repository.save(product);
+
+        createDto.ubicacion.forEach(async (ubicacion)=>{
+        // busco la tienda-section-id
+        const shopSection = this.shopSectionsRepository.findOne({
+          where:{
+            shop: ubicacion.shop as any,
+            section: ubicacion.section as any
+          }
+        }) 
+        if(!shopSection){
+            returnDto.isSuccess = false;
+            returnDto.returnCode = CodeEnum.BAD_REQUEST;
+            returnDto.errorMessage = ResourceEnum.ALREADY_EXST;
+        }
+        else {
+
+          // con la ubicación salvo el producto 
+          const added = new ShopSectionProducts()
+          added.product = product
+          added.existence =  ubicacion.existence
+          added.price =  ubicacion.price
+          added.shopSection = await shopSection
+          await this.shopSectionProductRepository.save(added)
+        }
+      })
+        
       } catch (error) {
         returnDto.isSuccess = false;
         returnDto.errorMessage = error.message;
@@ -88,16 +119,7 @@ export class ProductService extends BaseServiceCRUD<
       await fs.mkdir(directory, { recursive: true });
     }
   }
-  // async saveProductImage(name: string, base64Image: string): Promise<string> {
-  //   const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '');
-  //   const buffer = Buffer.from(base64Data, 'base64');
-  //   const fileName = `${name}.png`; // Adjust extension as needed
-  //   const filePath = path.join(__dirname, '..', '..', this.imageFolder, fileName);
 
-  //   await fs.writeFile(filePath, buffer);
-
-  //   return fileName;
-  // }
 
   async findItems(searchDto: ProductSearchDto): Promise<Product[]> {
     const queryBuilder = this.repository

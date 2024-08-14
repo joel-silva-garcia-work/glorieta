@@ -13,4 +13,7 @@ export class ShopSectionProducts extends BasicEntity {
 
   @Column({ type: 'int' })
   existence: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 ,nullable: true})
+  price: number;
 }
