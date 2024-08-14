@@ -32,6 +32,7 @@ import { ShopModule } from './shop/shop.module';
 import { ShopSectionProductsModule } from './shop-section-products/shop-section-products.module';
 import { ShopSectionsModule } from './shop-sections/shop-sections.module';
 import { TipoCambioModule } from './tipo-cambio/tipo-cambio.module';
+import { TiendaSeccionProductoMarcaModeloViewModule } from './tienda-seccion-producto-marca-modelo-view/tienda-seccion-producto-marca-modelo-view.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { TipoCambioModule } from './tipo-cambio/tipo-cambio.module';
     ShopSectionProductsModule,
     ShopSectionsModule,
     TipoCambioModule,
+    TiendaSeccionProductoMarcaModeloViewModule,
   ],
   controllers: [],
   providers: [GlobalesService],

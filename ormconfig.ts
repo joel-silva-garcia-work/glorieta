@@ -24,6 +24,7 @@ import { Shop } from 'src/shop/entities/shop.entity';
 import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-section-product.entity';
 import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
 import { TipoCambio } from 'src/tipo-cambio/entities/tipo-cambio.entity';
+import { TiendaSeccionProductoMarcaModeloView } from 'src/tienda-seccion-producto-marca-modelo-view/entities/tienda-seccion-producto-marca-modelo-view.entity';
 
 dotenv.config(); // Carga las variables de entorno desde el archivo .env
 
@@ -62,6 +63,7 @@ export const config: TypeOrmModuleOptions = {
     ShopSectionProducts,
     ShopSections,
     TipoCambio,
+    TiendaSeccionProductoMarcaModeloView,
   ],
   // entities: [__dirname + '/**/*.entity{.ts,.js}'],
   migrations: ['src/database/migrations/*.ts'],
