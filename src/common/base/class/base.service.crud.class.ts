@@ -346,7 +346,7 @@ export class BaseServiceCRUD<
     this.valid = true;
     if (rules.comparisonKind == KindEnum.UINQUE) {
       const scenarios = [];
-      rules.field.forEach((rule: string) => {
+      rules.field.forEach(rule => {
         const scenario = new ValidateScenarioDto();
         scenario.table = this.dto.repo.metadata.tableName;
         scenario.field = rule;

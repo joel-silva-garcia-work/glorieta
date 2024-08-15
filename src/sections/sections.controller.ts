@@ -17,8 +17,8 @@ export class SectionsController extends BaseControllerCRUD<CreateSectionDto,Upda
     super(Service)
   }  
 
-  @Post('add-shop')
-  async addShop(@Body()addSection: CreateSectionDto):Promise<ReturnDto>{
+  @Post('add-section')
+  async addSection(@Body()addSection: CreateSectionDto):Promise<ReturnDto>{
     return this.Service.addSection(addSection)
   }
 }

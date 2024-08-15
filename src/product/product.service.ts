@@ -14,6 +14,7 @@ import { ResourceEnum } from 'src/common/enum/resource.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-section-product.entity';
 import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
+import { UpdateExistenceDto } from './dto/update-existence.dto';
 
 @Injectable()
 export class ProductService extends BaseServiceCRUD<
@@ -80,6 +81,79 @@ export class ProductService extends BaseServiceCRUD<
         }
       })
         
+      } catch (error) {
+        returnDto.isSuccess = false;
+        returnDto.errorMessage = error.message;
+        returnDto.returnCode = error.code;
+      }
+    } else {
+      returnDto.isSuccess = false;
+      returnDto.returnCode = CodeEnum.BAD_REQUEST;
+      returnDto.errorMessage = ResourceEnum.ALREADY_EXST;
+    }
+    return returnDto;
+  }
+  async updateDetail(updateDto: UpdateProductDto): Promise<ReturnDto> {
+    const returnDto: ReturnDto = new ReturnDto();
+    let valid = true;
+    if (updateDto.rules) {
+      valid = await this._validate(updateDto);
+    }
+    if (valid) {
+      try {
+        
+        const product = await this.repository.findOne({
+          where:{
+            id: updateDto.id
+          }
+        });
+        if(product){
+          product.description = updateDto.description;
+          product.name = updateDto.name;
+          product.marca = updateDto.marca as any;
+          product.modelo = updateDto.modelo as any;
+  
+          product.photo = await this.saveProductImage(updateDto.photo);
+          returnDto.data = await this.repository.save(product);
+        }
+        else {
+          returnDto.isSuccess = false;
+          returnDto.returnCode = CodeEnum.BAD_REQUEST;
+          returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_FOUND;
+        } 
+      } catch (error) {
+        returnDto.isSuccess = false;
+        returnDto.errorMessage = error.message;
+        returnDto.returnCode = error.code;
+      }
+    } else {
+      returnDto.isSuccess = false;
+      returnDto.returnCode = CodeEnum.BAD_REQUEST;
+      returnDto.errorMessage = ResourceEnum.ALREADY_EXST;
+    }
+    return returnDto;
+  }
+  async updateExistence(updateDto: UpdateExistenceDto): Promise<ReturnDto> {
+    const returnDto: ReturnDto = new ReturnDto();
+    let valid = true;
+    if (valid) {
+      try {
+        
+        const product = await this.shopSectionProductRepository.findOne({
+          where:{
+            id: updateDto.id
+          }
+        });
+        if(product){
+          product.existence = updateDto.ubicacion.existence;
+          product.price = updateDto.ubicacion.price;
+          returnDto.data = await this.shopSectionProductRepository.save(product);
+        }
+        else {
+          returnDto.isSuccess = false;
+          returnDto.returnCode = CodeEnum.BAD_REQUEST;
+          returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_FOUND;
+        } 
       } catch (error) {
         returnDto.isSuccess = false;
         returnDto.errorMessage = error.message;

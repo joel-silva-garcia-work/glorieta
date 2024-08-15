@@ -1,9 +1,9 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { CreateProductDto } from './create-product.dto';
 import { IsUUID, IsString } from 'class-validator';
 
-export class UpdateProductDto extends PartialType(CreateProductDto) {
-
+export class UpdateProductDto extends PartialType(
+    OmitType(CreateProductDto, ['ubicacion'] as const),){
     @ApiProperty()
     @IsUUID()
     @IsString()
