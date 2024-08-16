@@ -20,6 +20,12 @@ export class CreateMunicipalityDto {
   @IsString()
   province_id: string;
 
+  @ApiProperty({ default: 0, type: 'double precision' })
+  latitude: number
+
+  @ApiProperty({ default: 0, type: 'double precision' })
+  longitude: number
+
   @ApiProperty()
   @IsNotEmpty()
   rules: RulesDto;

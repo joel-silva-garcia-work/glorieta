@@ -17,6 +17,10 @@ export class Municipality extends ExtendedEntity {
   @JoinColumn({ name: 'province_id' })
   province: Province;
 
-  
+  @Column({ default: 0, type: 'double precision' })
+  latitude: number
+
+  @Column({ default: 0, type: 'double precision' })
+  longitude: number  
 
 }
