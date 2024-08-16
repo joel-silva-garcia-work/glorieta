@@ -10,13 +10,11 @@ export class UbicacionProductDto {
   @ApiProperty()
   @IsUUID()
   @IsString()
-  shop: string;
+  product: string;
 
-  @ApiProperty()
   @IsUUID()
   @IsString()
-  section: string;
-
+  shopSection: string;
 
   @ApiProperty()
   @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
@@ -25,5 +23,11 @@ export class UbicacionProductDto {
   @ApiProperty()
   @IsInt()
   existence: number;
+
+  @ApiProperty({
+    isArray: true,
+    type:JSON
+  })
+  caracteristcas:Record<string, any>[]
 
 }

@@ -21,6 +21,4 @@ export class Product extends BasicInformationEntity {
   @Column({ type: 'text' })
   photo: string;
 
-  @Column('json',{nullable:true})
-  carcteristicas: Record<string, any>
 }

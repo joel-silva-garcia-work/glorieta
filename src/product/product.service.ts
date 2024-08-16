@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Post } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +14,12 @@ import { ResourceEnum } from 'src/common/enum/resource.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-section-product.entity';
 import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
-import { UpdateExistenceDto } from './dto/update-existence.dto';
+import { UpdateExistenceDto } from '../shop-section-products/dto/update-existence.dto';
+import { BaseDto } from 'src/common/base/dto/base.crud.dto';
+import { ValidateScenarioDto } from 'src/common/base/dto/validate.scenario.dto';
+import { ClassValidator } from 'src/common/base/validator/class.validator';
+import { KindEnum } from 'src/common/enum/kind.enum';
+import { LocateProductDto } from '../shop-section-products/dto/locate-product.dto';
 
 @Injectable()
 export class ProductService extends BaseServiceCRUD<
@@ -35,63 +40,69 @@ export class ProductService extends BaseServiceCRUD<
   ) {
     super(repository);
   }
+  @Post('ubicar')
+  async locate(createDto: LocateProductDto): Promise<ReturnDto> {
+    // const returnDto: ReturnDto = new ReturnDto();
+    // let valid = true;
+    // if (createDto.rules) {
+    //   createDto.ubicaciones.forEach(async (ubicacion)=>{
+    //     if(! await this._validate(ubicacion)){
+    //       valid = false;   
+    //     }
+    //     else{
 
-  override async create(createDto: CreateProductDto): Promise<ReturnDto> {
-    const returnDto: ReturnDto = new ReturnDto();
-    let valid = true;
-    if (createDto.rules) {
-      valid = await this._validate(createDto);
-    }
+    //     }
+    //   })
+    // }
 
-    if (valid) {
-      try {
-        const product: Product = new Product();
+    // if (valid) {
+    //   try {
+    //     const product: Product = new ShopSectionProducts();
 
-        product.description = createDto.description;
-        product.name = createDto.name;
-        product.marca = createDto.marca as any;
-        product.modelo = createDto.modelo as any;
+    //     product.description = createDto.description;
+    //     product.name = createDto.name;
+    //     product.marca = createDto.marca as any;
+    //     product.modelo = createDto.modelo as any;
 
-        product.photo = await this.saveProductImage(createDto.photo);
 
-        returnDto.data = await this.repository.save(product);
+    //     returnDto.data = await this.repository.save(product);
 
-        createDto.ubicacion.forEach(async (ubicacion)=>{
-        // busco la tienda-section-id
-        const shopSection = this.shopSectionsRepository.findOne({
-          where:{
-            shop: ubicacion.shop as any,
-            section: ubicacion.section as any
-          }
-        }) 
-        if(!shopSection){
-            returnDto.isSuccess = false;
-            returnDto.returnCode = CodeEnum.BAD_REQUEST;
-            returnDto.errorMessage = ResourceEnum.ALREADY_EXST;
-        }
-        else {
+    //     createDto.ubicacion.forEach(async (ubicacion)=>{
+    //     // busco la tienda-section-id
+    //     const shopSection = this.shopSectionsRepository.findOne({
+    //       where:{
+    //         shop: ubicacion.shop as any,
+    //         section: ubicacion.section as any
+    //       }
+    //     }) 
+    //     if(!shopSection){
+    //         returnDto.isSuccess = false;
+    //         returnDto.returnCode = CodeEnum.BAD_REQUEST;
+    //         returnDto.errorMessage = ResourceEnum.ALREADY_EXST;
+    //     }
+    //     else {
 
-          // con la ubicación salvo el producto 
-          const added = new ShopSectionProducts()
-          added.product = product
-          added.existence =  ubicacion.existence
-          added.price =  ubicacion.price
-          added.shopSection = await shopSection
-          await this.shopSectionProductRepository.save(added)
-        }
-      })
+    //       // con la ubicación salvo el producto 
+    //       const added = new ShopSectionProducts()
+    //       added.product = product
+    //       added.existence =  ubicacion.existence
+    //       added.price =  ubicacion.price
+    //       added.shopSection = await shopSection
+    //       await this.shopSectionProductRepository.save(added)
+    //     }
+    //   })
         
-      } catch (error) {
-        returnDto.isSuccess = false;
-        returnDto.errorMessage = error.message;
-        returnDto.returnCode = error.code;
-      }
-    } else {
-      returnDto.isSuccess = false;
-      returnDto.returnCode = CodeEnum.BAD_REQUEST;
-      returnDto.errorMessage = ResourceEnum.ALREADY_EXST;
-    }
-    return returnDto;
+    //   } catch (error) {
+    //     returnDto.isSuccess = false;
+    //     returnDto.errorMessage = error.message;
+    //     returnDto.returnCode = error.code;
+    //   }
+    // } else {
+    //   returnDto.isSuccess = false;
+    //   returnDto.returnCode = CodeEnum.BAD_REQUEST;
+    //   returnDto.errorMessage = ResourceEnum.ALREADY_EXST;
+    // }
+    return null;
   }
   async updateDetail(updateDto: UpdateProductDto): Promise<ReturnDto> {
     const returnDto: ReturnDto = new ReturnDto();
@@ -193,7 +204,25 @@ export class ProductService extends BaseServiceCRUD<
       await fs.mkdir(directory, { recursive: true });
     }
   }
-
+// revisar y arreglar
+  override async _validate(dto: BaseDto): Promise<boolean> {
+    const rules = dto.rules;
+    let valid = true;
+    if (rules.comparisonKind == KindEnum.UINQUE) {
+      const scenarios = [];
+      rules.field.forEach(rule => {
+        const scenario = new ValidateScenarioDto();
+        scenario.table = this.shopSectionProductRepository.metadata.tableName;
+        // if(rule != "name")
+        scenario.field = rule;
+        scenario.value = dto[rule];
+        scenarios.push(scenario);
+      });
+      const validated: ClassValidator = new ClassValidator();
+      valid = await validated.validate(this.shopSectionProductRepository, scenarios);
+    }
+    return valid;
+  }
 
   async findItems(searchDto: ProductSearchDto): Promise<Product[]> {
     const queryBuilder = this.repository

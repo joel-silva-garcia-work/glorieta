@@ -7,7 +7,7 @@ import {
   IsArray,
 } from 'class-validator';
 import { RulesDto } from 'src/common/base/dto/rules.dto';
-import { UbicacionProductDto } from './ubicacion-producto.dto';
+import { UbicacionProductDto } from '../../shop-section-products/dto/ubicacion-producto.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProductDto {
@@ -31,12 +31,6 @@ export class CreateProductDto {
   @IsString()
   photo: string;
 
-  @IsArray()
-  @ApiProperty({
-    type:[UbicacionProductDto],
-    isArray: true
-  })
-  ubicacion: [UbicacionProductDto]
   @IsNotEmpty()
   rules: RulesDto;
 }

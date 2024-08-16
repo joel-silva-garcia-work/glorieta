@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateProductDto } from './create-product.dto';
+import { CreateProductDto } from '../../product/dto/create-product.dto';
 import { IsUUID, IsString } from 'class-validator';
 import { UbicacionProductDto } from './ubicacion-producto.dto';
 
