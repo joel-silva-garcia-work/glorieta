@@ -205,24 +205,24 @@ export class ProductService extends BaseServiceCRUD<
     }
   }
 // revisar y arreglar
-  override async _validate(dto: BaseDto): Promise<boolean> {
-    const rules = dto.rules;
-    let valid = true;
-    if (rules.comparisonKind == KindEnum.UINQUE) {
-      const scenarios = [];
-      rules.field.forEach(rule => {
-        const scenario = new ValidateScenarioDto();
-        scenario.table = this.shopSectionProductRepository.metadata.tableName;
-        // if(rule != "name")
-        scenario.field = rule;
-        scenario.value = dto[rule];
-        scenarios.push(scenario);
-      });
-      const validated: ClassValidator = new ClassValidator();
-      valid = await validated.validate(this.shopSectionProductRepository, scenarios);
-    }
-    return valid;
-  }
+  // override async _validate(dto: BaseDto): Promise<boolean> {
+  //   const rules = dto.rules;
+  //   let valid = true;
+  //   if (rules.comparisonKind == KindEnum.UINQUE) {
+  //     const scenarios = [];
+  //     rules.field.forEach(rule => {
+  //       const scenario = new ValidateScenarioDto();
+  //       scenario.table = this.shopSectionProductRepository.metadata.tableName;
+  //       // if(rule != "name")
+  //       scenario.field = rule;
+  //       scenario.value = dto[rule];
+  //       scenarios.push(scenario);
+  //     });
+  //     const validated: ClassValidator = new ClassValidator();
+  //     valid = await validated.validate(this.shopSectionProductRepository, scenarios);
+  //   }
+  //   return valid;
+  // }
 
   async findItems(searchDto: ProductSearchDto): Promise<Product[]> {
     const queryBuilder = this.repository

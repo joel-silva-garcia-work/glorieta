@@ -13,7 +13,7 @@ export class ShopSectionProducts extends BasicEntity {
 
   
   @Column('json',{nullable:true})
-  carcteristicas: Record<string, any>
+  caracteristicas: Record<string, any>
 
   @Column({ type: 'int' })
   existence: number;
