@@ -125,6 +125,7 @@ export class BaseServiceCRUD<
   }
 
   async findOne(searchDto: SearchManyDto) {
+    this.returnDto.data = []
     const item = await this.dto.repo.findOne({
       where: {
         id: searchDto.id,
@@ -134,7 +135,7 @@ export class BaseServiceCRUD<
       this.returnDto.isSuccess = false;
       // traducir
       this.returnDto.returnCode = CodeEnum.BAD_REQUEST;
-    } else {
+    } else if(searchDto.id == item.id) {
       this.returnDto.data = [item];
     }
   }
