@@ -1,9 +1,8 @@
-// src/marcas/dto/marcas-search.dto.ts
 import { Type } from 'class-transformer';
 import { IsArray, IsEmail, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { OrderByFieldDto } from 'src/common/base/dto/orderByField.dto';
 
-export class MarcasSearchDto {
+export class ShopSearchDto {
   @IsOptional()
   @IsString()
   readonly name?: string;

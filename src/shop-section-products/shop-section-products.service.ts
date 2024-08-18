@@ -46,7 +46,6 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
   //     // element.price = ubicacion.price
   //     // element.existence = ubicacion.existence
   //     // element.caracteristicas = ubicacion.caracteristcas as any 
-  //     console.log(ubicacion.caracteristcas)
   //     await this.repository.save({
   //       product: product,
   //       shopSection: shopSection,

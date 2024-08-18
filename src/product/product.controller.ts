@@ -17,20 +17,20 @@ export class ProductController extends BaseControllerCRUD<CreateProductDto,Updat
   constructor(private readonly Service: ProductService) {
     super(Service)
   }  
-    @Get('/nuevo')
-  @Render('marcas/nuevo') // Renderiza la vista 'listar.ejs'
-  async openForm(
-    @Req() request: Request,
-    @Body() openform: openFormDto) 
-      :Promise<any> {
-      const csrfToken = request.csrfToken(); // Genera el token CSRF
+  // @Get('/nuevo')
+  // @Render('marcas/nuevo') // Renderiza la vista 'listar.ejs'
+  // async openForm(
+  //   @Req() request: Request,
+  //   @Body() openform: openFormDto) 
+  //     :Promise<any> {
+  //     const csrfToken = request.csrfToken(); // Genera el token CSRF
 
-    const marca = await this.Service.openForm(openform);
-    return {marca, csrfToken } ;
-  }
-  @Get()
-  async findItems(@Query() searchDto: ProductSearchDto): Promise<Product[]> {
-    return this.Service.findItems(searchDto);
+  //   const marca = await this.Service.openForm(openform);
+  //   return {marca, csrfToken } ;
+  // }
+  @Get('items')
+  async findItems(@Body() searchDto: ProductSearchDto): Promise<ReturnDto> {
+    return this.Service.findItems(searchDto) ;
   }
   @Post('/ubicar')
   async ubicar(updateDto: UpdateProductDto): Promise<ReturnDto>{

@@ -1,28 +1,42 @@
 // src/product/dto/product-search.dto.ts
-import { IsOptional, IsString, IsUUID, IsDecimal } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsOptional, IsString, IsUUID, IsDecimal, IsNumber, IsArray, ValidateNested } from 'class-validator';
+import { OrderByFieldDto } from 'src/common/base/dto/orderByField.dto';
 
 export class ProductSearchDto {
+
   @IsOptional()
   @IsString()
   readonly name?: string;
 
   @IsOptional()
-  @IsUUID()
-  readonly marcaId?: string;
-
-  @IsOptional()
-  @IsUUID()
-  readonly modeloId?: string;
-
-  @IsOptional()
   @IsString()
-  readonly descripcion?: string;
+  readonly description?: string;
 
   @IsOptional()
-  @IsString()
-  readonly photo?: string;
+  @IsUUID()
+  readonly marca?: string;
 
   @IsOptional()
-  @IsDecimal()
-  readonly price?: number;
+  @IsUUID()
+  readonly modelo?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderByFieldDto)
+  orderBy?: OrderByFieldDto[]; // Array de campos y direcciones de ordenamiento
+  
+  @IsOptional()
+  @IsNumber()
+  skip?: number;
+
+  @IsOptional()
+  @IsNumber()
+  take?: number;
+
+  photo: string;
+  price: number;
+
+
 }

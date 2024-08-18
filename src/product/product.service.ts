@@ -140,8 +140,8 @@ export class ProductService extends BaseServiceCRUD<
         if(product){
           product.description = updateDto.description;
           product.name = updateDto.name;
-          product.marca = updateDto.marca as any;
-          product.modelo = updateDto.modelo as any;
+          product.marca = updateDto.marca;
+          product.modelo = updateDto.modelo;
   
           product.photo = await this.saveProductImage(updateDto.photo);
           returnDto.data = await this.repository.save(product);
@@ -243,11 +243,11 @@ export class ProductService extends BaseServiceCRUD<
   //   return valid;
   // }
 
-  async findItems(searchDto: ProductSearchDto): Promise<Product[]> {
+  async findItems(searchDto: ProductSearchDto): Promise<ReturnDto> {
+    const returnDto = new ReturnDto();
+
     const queryBuilder = this.repository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.marca', 'marca')
-      .leftJoinAndSelect('product.modelo', 'modelo');
 
     if (searchDto.name) {
       queryBuilder.andWhere('product.name LIKE :name', {
@@ -255,36 +255,47 @@ export class ProductService extends BaseServiceCRUD<
       });
     }
 
-    if (searchDto.marcaId) {
-      queryBuilder.andWhere('product.marcaId = :marcaId', {
-        marcaId: searchDto.marcaId,
+    if (searchDto.marca) {
+      queryBuilder.andWhere('product.marca = :marca', {
+        marca: searchDto.marca,
       });
     }
 
-    if (searchDto.modeloId) {
-      queryBuilder.andWhere('product.modeloId = :modeloId', {
-        modeloId: searchDto.modeloId,
+    if (searchDto.modelo) {
+      queryBuilder.andWhere('product.modelo = :modelo', {
+        modelo: searchDto.modelo,
       });
     }
 
-    if (searchDto.descripcion) {
-      queryBuilder.andWhere('product.descripcion LIKE :descripcion', {
-        descripcion: `%${searchDto.descripcion}%`,
+    if (searchDto.description) {
+      queryBuilder.andWhere('product.description LIKE :description', {
+        description: `%${searchDto.description}%`,
       });
     }
 
-    if (searchDto.photo) {
-      queryBuilder.andWhere('product.photo LIKE :photo', {
-        photo: `%${searchDto.photo}%`,
+     // Aplicar ordenamiento
+     if (searchDto.orderBy && searchDto.orderBy.length > 0) {
+      searchDto.orderBy.forEach((orderByField, index) => {
+        if (index === 0) {
+          queryBuilder.orderBy(`product.${orderByField.field}`, orderByField.direction);
+        } else {
+          queryBuilder.addOrderBy(`product.${orderByField.field}`, orderByField.direction);
+        }
       });
     }
 
-    if (searchDto.price) {
-      queryBuilder.andWhere('product.price = :price', {
-        price: searchDto.price,
-      });
-    }
+    // Aplicar paginación
+    const skip = searchDto.skip || 0; // Valor predeterminado de 0 si no se proporciona
+    const take = searchDto.take || 10; // Valor predeterminado de 10 si no se proporciona
+  
+    queryBuilder.skip(this.startPage(skip, take)).take(take);
+  
 
-    return queryBuilder.getMany();
+    // Verificar la consulta generada para depuración
+    console.log(queryBuilder.getSql());
+    
+    returnDto.data = await queryBuilder.getMany();
+    return returnDto;  
   }
+
 }
