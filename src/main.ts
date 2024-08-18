@@ -5,6 +5,9 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ClearWhiteSpaceInterceptor } from './common/base/interceptors/white-space.interceptor';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import csurf from 'csurf';
+import * as express from 'express';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -29,7 +32,18 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  // iniciando puerto 5000 free el 3000 para frontend
-  await app.listen(5000);
+   // Configurar CSRF
+   app.use(cookieParser());
+   app.use(express.urlencoded({ extended: true }));
+ 
+   // Configurar CSRF
+  //  app.use(csurf({
+  //    cookie: { 
+  //      httpOnly: true, 
+  //      secure: process.env.NODE_ENV === 'production', 
+  //      sameSite: 'strict' 
+  //    }
+  //  }));
+   await app.listen(5000);
 }
 bootstrap();

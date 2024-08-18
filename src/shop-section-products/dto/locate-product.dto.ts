@@ -17,6 +17,5 @@ export class LocateProductDto {
     isArray: true
   })
   ubicaciones: [UbicacionProductDto]
-  @IsNotEmpty()
-  rules: RulesDto;
+
 }

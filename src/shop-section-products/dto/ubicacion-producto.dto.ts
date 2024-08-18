@@ -26,7 +26,7 @@ export class UbicacionProductDto {
 
   @ApiProperty({
     isArray: true,
-    type:JSON
+    // type:JSON
   })
   caracteristcas:Record<string, any>[]
 

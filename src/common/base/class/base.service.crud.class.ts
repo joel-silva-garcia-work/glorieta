@@ -12,7 +12,6 @@ import { SearchManyDto } from '../dto/search.many.dto';
 import { ComparisonType } from 'src/common/enum/comparison.type.enum';
 import { ConditionSearchDto } from '../dto/condition.search.dto';
 import { RelationSelectDto } from '../dto/relation.search.dto';
-import { OrderDto } from '../dto/order.dto';
 
 export class BaseServiceCRUD<
   TEntity,
@@ -120,20 +119,10 @@ export class BaseServiceCRUD<
       await this.findOne(searchDto);
     } else if (searchDto.queryType == fieldsEnum.ALL) {
       await this.findAll(searchDto);
-    } else {
-      await this.findByCriteria(searchDto);
-    }
+    } 
 
-    // if (searchDto.queryType != fieldsEnum.ONE) {
-    //   this.returnDto.data = this.sortJson(
-    //     this.returnDto.data as any[],
-    //     searchDto.orderBy,
-    //   );
-    // }
     return this.returnDto;
   }
-
-
 
   async findOne(searchDto: SearchManyDto) {
     const item = await this.dto.repo.findOne({
@@ -151,193 +140,21 @@ export class BaseServiceCRUD<
   }
 
   async findAll(searchDto: SearchManyDto) {
-    this.returnDto.data = await this.dto.repo.find();
-    return this.returnDto;
+    
+    this.returnDto.data = await this.dto.repo.find({
+      skip: this.startPage(searchDto.skip, searchDto.take),
+      take: searchDto.take,
+    });
   }
 
-  async findByCriteria(searchDto: SearchManyDto) {
-    this.addSelectFields(this.queryBuilder, searchDto.select);
-    this.addWhereConditions(this.queryBuilder, searchDto.where);
-    this.addRelations(this.queryBuilder, searchDto.relations);
-    // this.addOrderBy(this.queryBuilder, searchDto.orderBy);
 
-    if (searchDto.skip !== undefined && searchDto.take !== undefined) {
-      this.addPagination(searchDto);
-    } else if (searchDto.skip !== undefined) {
-      this.queryBuilder.skip(this.startPage(searchDto.skip, searchDto.take));
-    } else if (searchDto.take !== undefined) {
-      this.queryBuilder.take(searchDto.take);
-    }
 
-    this.returnDto.data = await this.queryBuilder.getMany();
-  }
-
-  private addSelectFields(
-    queryBuilder: SelectQueryBuilder<any>,
-    selectFields?: string[],
-  ) {
-    if (selectFields && selectFields.length > 0) {
-      queryBuilder.select(
-        selectFields.map((field) => `${queryBuilder.alias}.${field}`),
-      );
-    }
-  }
-
-  private addWhereConditions(
-    queryBuilder: SelectQueryBuilder<any>,
-    whereConditions?: ConditionSearchDto[],
-  ) {
-    if (whereConditions) {
-      whereConditions.forEach((condition) => {
-        const { type, field, value, range } = condition;
-        switch (type) {
-          case ComparisonType.EQUAL:
-            queryBuilder.andWhere(
-              `${queryBuilder.alias}.${field} = :${field}`,
-              { [field]: value },
-            );
-            break;
-          case ComparisonType.LIKE:
-            queryBuilder.andWhere(
-              `${queryBuilder.alias}.${field} LIKE :${field}`,
-              { [field]: `%${value}%` },
-            );
-            break;
-          case ComparisonType.BIGGER_THAN:
-            queryBuilder.andWhere(
-              `${queryBuilder.alias}.${field} > :${field}`,
-              { [field]: value },
-            );
-            break;
-          case ComparisonType.LESS_THAN:
-            queryBuilder.andWhere(
-              `${queryBuilder.alias}.${field} < :${field}`,
-              { [field]: value },
-            );
-            break;
-          case ComparisonType.BETWEEN:
-            if (range && range.length === 2) {
-              queryBuilder.andWhere(
-                `${queryBuilder.alias}.${field} BETWEEN :start AND :end`,
-                {
-                  start: range[0],
-                  end: range[1],
-                },
-              );
-            }
-            break;
-          default:
-            break;
-        }
-      });
-    }
-  }
-
-  private addRelations(
-    queryBuilder: SelectQueryBuilder<any>,
-    relations?: { [key: string]: RelationSelectDto },
-    // mainEntity: string
-  ) {
-    const mainEntity = this.dto.repo.metadata.tableName;
-    if (relations) {
-      const joinedRelations = new Set<string>();
-      const selectFields = new Set<string>();
-
-      Object.keys(relations).forEach((relation) => {
-        const { select, where, orderBy } = relations[relation];
-        const relationAlias = `${mainEntity}_${relation}`;
-
-        // Avoid adding the same relation more than once
-        if (!joinedRelations.has(relationAlias)) {
-          if (where && where.length > 0)
-            queryBuilder.leftJoinAndSelect(
-              `${mainEntity}.${relation}`,
-              relationAlias,
-            );
-          else
-            queryBuilder.innerJoin(`${mainEntity}.${relation}`, relationAlias);
-          joinedRelations.add(relationAlias);
-        }
-
-        // Add selected fields for the relation
-        if (select && select.length > 0) {
-          select.forEach((field) => {
-            const fieldAlias = `${relationAlias}.${field}`;
-            if (!selectFields.has(fieldAlias)) {
-              queryBuilder.addSelect(fieldAlias);
-              selectFields.add(fieldAlias);
-            }
-          });
-        }
-
-        // Add where conditions for the relation
-        if (where && where.length > 0) {
-          where.forEach((condition) => {
-            const { type, field, value, range } = condition;
-            switch (type) {
-              case ComparisonType.EQUAL:
-                queryBuilder.andWhere(
-                  `${relationAlias}.${field} = :${field}_rel`,
-                  { [`${field}_rel`]: value },
-                );
-                break;
-              case ComparisonType.LIKE:
-                queryBuilder.andWhere(
-                  `${relationAlias}.${field} LIKE :${field}_rel`,
-                  { [`${field}_rel`]: `%${value}%` },
-                );
-                break;
-              case ComparisonType.BIGGER_THAN:
-                queryBuilder.andWhere(
-                  `${relationAlias}.${field} > :${field}_rel`,
-                  { [`${field}_rel`]: value },
-                );
-                break;
-              case ComparisonType.LESS_THAN:
-                queryBuilder.andWhere(
-                  `${relationAlias}.${field} < :${field}_rel`,
-                  { [`${field}_rel`]: value },
-                );
-                break;
-              case ComparisonType.BETWEEN:
-                if (range && range.length === 2) {
-                  queryBuilder.andWhere(
-                    `${relationAlias}.${field} BETWEEN :start_rel AND :end_rel`,
-                    {
-                      start_rel: range[0],
-                      end_rel: range[1],
-                    },
-                  );
-                }
-                break;
-              default:
-                break;
-            }
-          });
-        }
-
-        // Add order by fields for the relation
-        // if (orderBy) {
-        //   this.addOrderBy(queryBuilder,orderBy)
-        // }
-      });
-    }
-  }
-
-  // private addOrderBy(queryBuilder: SelectQueryBuilder<any>, orderBy?: OrderDto[]) {
-  //   if (orderBy && orderBy.length > 0) {
-  //     orderBy.forEach(order => {
-  //       queryBuilder.addOrderBy(`${order.field}`,`${order.order}`);
-  //     });
-  //   }
-  // }
-
-  private addPagination(searchDto: SearchManyDto) {
+  protected addPagination(searchDto: SearchManyDto) {
     this.queryBuilder
       .skip(this.startPage(searchDto.skip, searchDto.take))
       .take(searchDto.take);
   }
-  private startPage(page: number, limit: number) {
+  protected startPage(page: number, limit: number) {
     return page * limit;
   }
 

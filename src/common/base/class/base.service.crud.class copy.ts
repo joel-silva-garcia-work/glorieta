@@ -120,32 +120,31 @@ export class BaseServiceCRUD<
       await this.findOne(searchDto);
     } else if (searchDto.queryType == fieldsEnum.ALL) {
       await this.findAll(searchDto);
-    } else {
-      await this.findByCriteria(searchDto);
-    }
+    } 
+    
 
-    if (searchDto.queryType != fieldsEnum.ONE) {
-      this.returnDto.data = this.sortJson(
-        this.returnDto.data as any[],
-        searchDto.orderBy,
-      );
-    }
+    // if (searchDto.queryType != fieldsEnum.ONE) {
+    //   this.returnDto.data = this.sortJson(
+    //     this.returnDto.data as any[],
+    //     searchDto.orderBy,
+    //   );
+    // }
     return this.returnDto;
   }
 
-  private sortJson(data: any[], orderBy: OrderDto[]): any[] {
-    return data.sort((a, b) => {
-      for (const { field, order } of orderBy) {
-        const [fieldPath, subField] = field.split('.');
-        const aValue = subField ? a[fieldPath]?.[subField] : a[fieldPath];
-        const bValue = subField ? b[fieldPath]?.[subField] : b[fieldPath];
+  // private sortJson(data: any[], orderBy: OrderDto[]): any[] {
+  //   return data.sort((a, b) => {
+  //     for (const { field, order } of orderBy) {
+  //       const [fieldPath, subField] = field.split('.');
+  //       const aValue = subField ? a[fieldPath]?.[subField] : a[fieldPath];
+  //       const bValue = subField ? b[fieldPath]?.[subField] : b[fieldPath];
 
-        if (aValue < bValue) return order === 'ASC' ? -1 : 1;
-        if (aValue > bValue) return order === 'ASC' ? 1 : -1;
-      }
-      return 0; // If all compared fields are equal
-    });
-  }
+  //       if (aValue < bValue) return order === 'ASC' ? -1 : 1;
+  //       if (aValue > bValue) return order === 'ASC' ? 1 : -1;
+  //     }
+  //     return 0; // If all compared fields are equal
+  //   });
+  // }
 
   async findOne(searchDto: SearchManyDto) {
     const item = await this.dto.repo.findOne({
@@ -169,189 +168,6 @@ export class BaseServiceCRUD<
     });
   }
 
-  async findByCriteria(searchDto: SearchManyDto) {
-    this.addSelectFields(this.queryBuilder, searchDto.select);
-    this.addWhereConditions(this.queryBuilder, searchDto.where);
-    this.addRelations(this.queryBuilder, searchDto.relations);
-
-    if (searchDto.skip !== undefined && searchDto.take !== undefined) {
-      this.addPagination(searchDto);
-    } else if (searchDto.skip !== undefined) {
-      this.queryBuilder.skip(this.startPage(searchDto.skip, searchDto.take));
-    } else if (searchDto.take !== undefined) {
-      this.queryBuilder.take(searchDto.take);
-    }
-
-    this.returnDto.data = await this.queryBuilder.getMany();
-  }
-
-  private addSelectFields(
-    queryBuilder: SelectQueryBuilder<any>,
-    selectFields?: string[],
-  ) {
-    if (selectFields && selectFields.length > 0) {
-      queryBuilder.select(
-        selectFields.map((field) => `${queryBuilder.alias}.${field}`),
-      );
-    }
-  }
-
-  private addWhereConditions(
-    queryBuilder: SelectQueryBuilder<any>,
-    whereConditions?: ConditionSearchDto[],
-  ) {
-    if (whereConditions) {
-      whereConditions.forEach((condition) => {
-        const { type, field, JsonField, value, range } = condition;
-        switch (type) {
-          case ComparisonType.EQUAL:
-            if (JsonField) {
-              queryBuilder.andWhere(
-                `${queryBuilder.alias}.${field}->>'${JsonField}' = :${field}`,
-                { [field]: value },
-              );
-            } else {
-              queryBuilder.andWhere(
-                `${queryBuilder.alias}.${field} = :${field}`,
-                { [field]: value },
-              );
-            }
-            break;
-          case ComparisonType.LIKE:
-            if (JsonField) {
-              queryBuilder.andWhere(
-                `${queryBuilder.alias}.${field}->>'${JsonField}' LIKE :${field}`,
-                { [field]: `%${value}%` },
-              );
-            } else {
-              queryBuilder.andWhere(
-                `${queryBuilder.alias}.${field} LIKE :${field}`,
-                { [field]: `%${value}%` },
-              );
-            }
-            break;
-          case ComparisonType.BIGGER_THAN:
-            queryBuilder.andWhere(
-              `${queryBuilder.alias}.${field} > :${field}`,
-              { [field]: value },
-            );
-            break;
-          case ComparisonType.LESS_THAN:
-            queryBuilder.andWhere(
-              `${queryBuilder.alias}.${field} < :${field}`,
-              { [field]: value },
-            );
-            break;
-          case ComparisonType.BETWEEN:
-            if (range && range.length === 2) {
-              queryBuilder.andWhere(
-                `${queryBuilder.alias}.${field} BETWEEN :start AND :end`,
-                {
-                  start: range[0],
-                  end: range[1],
-                },
-              );
-            }
-            break;
-          default:
-            break;
-        }
-      });
-    }
-  }
-
-  private addRelations(
-    queryBuilder: SelectQueryBuilder<any>,
-    relations?: { [key: string]: RelationSelectDto },
-    // mainEntity: string
-  ) {
-    const mainEntity = this.dto.repo.metadata.tableName;
-    if (relations) {
-      const joinedRelations = new Set<string>();
-      const selectFields = new Set<string>();
-
-      Object.keys(relations).forEach((relation) => {
-        const { select, where, orderBy } = relations[relation];
-        const relationAlias = `${mainEntity}_${relation}`;
-        console.log(relationAlias);
-
-        // Avoid adding the same relation more than once
-        if (!joinedRelations.has(relationAlias)) {
-          if (where && where.length > 0)
-            queryBuilder.leftJoinAndSelect(
-              `${mainEntity}.${relation}`,
-              relationAlias,
-            );
-          else
-            queryBuilder.innerJoin(`${mainEntity}.${relation}`, relationAlias);
-          joinedRelations.add(relationAlias);
-        }
-
-        // Add selected fields for the relation
-        if (select && select.length > 0) {
-          select.forEach((field) => {
-            const fieldAlias = `${relationAlias}.${field}`;
-            if (!selectFields.has(fieldAlias)) {
-              queryBuilder.addSelect(fieldAlias);
-              selectFields.add(fieldAlias);
-            }
-          });
-        }
-
-        // Add where conditions for the relation
-        if (where && where.length > 0) {
-          where.forEach((condition) => {
-            const { type, field, JsonField, value, range } = condition;
-            switch (type) {
-              case ComparisonType.EQUAL:
-                queryBuilder.andWhere(
-                  `${relationAlias}.${field} = :${field}_rel`,
-                  { [`${field}_rel`]: value },
-                );
-                break;
-              case ComparisonType.LIKE:
-                queryBuilder.andWhere(
-                  `${relationAlias}.${field}->>'es' LIKE :${field}_rel`,
-                  { [`${field}_rel`]: `%${value}%` },
-                );
-                break;
-              case ComparisonType.BIGGER_THAN:
-                queryBuilder.andWhere(
-                  `${relationAlias}.${field} > :${field}_rel`,
-                  { [`${field}_rel`]: value },
-                );
-                break;
-              case ComparisonType.LESS_THAN:
-                queryBuilder.andWhere(
-                  `${relationAlias}.${field} < :${field}_rel`,
-                  { [`${field}_rel`]: value },
-                );
-                break;
-              case ComparisonType.BETWEEN:
-                if (range && range.length === 2) {
-                  queryBuilder.andWhere(
-                    `${relationAlias}.${field} BETWEEN :start_rel AND :end_rel`,
-                    {
-                      start_rel: range[0],
-                      end_rel: range[1],
-                    },
-                  );
-                }
-                break;
-              default:
-                break;
-            }
-          });
-        }
-      });
-    }
-  }
-
-  private addPagination(searchDto: SearchManyDto) {
-    this.queryBuilder
-      .skip(this.startPage(searchDto.skip, searchDto.take))
-      .take(searchDto.take);
-  }
   private startPage(page: number, limit: number) {
     return page * limit;
   }

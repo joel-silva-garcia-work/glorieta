@@ -7,6 +7,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { BaseControllerCRUD } from 'src/common/base/class/base.controller.crud.class';
 import { ModeloSearchDto } from './dto/modelo-search.dto';
 import { Modelo } from './entities/modelo.entity';
+import { ReturnDto } from 'src/common/base/dto';
 
 @ApiTags('Modelos')
 @Controller('modelos')
@@ -15,8 +16,8 @@ export class ModelosController extends BaseControllerCRUD<CreateModeloDto,Update
     super(Service)
   }  
 
-  @Get()
-  async findAll(@Query() searchDto: ModeloSearchDto): Promise<Modelo[]> {
-    return this.Service.findItems(searchDto);
+  @Get('items')
+  async findItems(@Body() searchDto: ModeloSearchDto): Promise<ReturnDto> {
+    return this.Service.findItems(searchDto) ;
   }
 }
