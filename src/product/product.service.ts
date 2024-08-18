@@ -20,6 +20,9 @@ import { ValidateScenarioDto } from 'src/common/base/dto/validate.scenario.dto';
 import { ClassValidator } from 'src/common/base/validator/class.validator';
 import { KindEnum } from 'src/common/enum/kind.enum';
 import { LocateProductDto } from '../shop-section-products/dto/locate-product.dto';
+import { SearchManyDto } from 'src/common/base/dto/search.many.dto';
+import { fieldsEnum } from 'src/common/enum/fields.enum';
+import { openFormDto } from 'src/common/base/dto/open-form.dto';
 
 @Injectable()
 export class ProductService extends BaseServiceCRUD<
@@ -40,6 +43,22 @@ export class ProductService extends BaseServiceCRUD<
   ) {
     super(repository);
   }
+
+  async openForm(openform: openFormDto):Promise<ReturnDto> {
+    if(openform.id){
+      const search = new SearchManyDto()
+      search.id = openform.id
+      search.queryType = fieldsEnum.ONE
+      search.repo = this.repository
+      return await this.search(search)
+    }
+
+    const returnDto = new ReturnDto
+    const product = new Product();
+    returnDto.data = product
+    return returnDto ;
+  }
+  
   @Post('ubicar')
   async locate(createDto: LocateProductDto): Promise<ReturnDto> {
     // const returnDto: ReturnDto = new ReturnDto();

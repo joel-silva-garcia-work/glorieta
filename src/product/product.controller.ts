@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Render, Req } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -8,6 +8,8 @@ import { ProductSearchDto } from './dto/product-search.dto';
 import { Product } from './entities/product.entity';
 import { ReturnDto } from 'src/common/base/dto';
 import { UpdateExistenceDto } from '../shop-section-products/dto/update-existence.dto';
+import { openFormDto } from 'src/common/base/dto/open-form.dto';
+import { Request, Response } from 'express';
 
 @ApiTags('Product')
 @Controller('product')
@@ -15,6 +17,17 @@ export class ProductController extends BaseControllerCRUD<CreateProductDto,Updat
   constructor(private readonly Service: ProductService) {
     super(Service)
   }  
+    @Get('/nuevo')
+  @Render('marcas/nuevo') // Renderiza la vista 'listar.ejs'
+  async openForm(
+    @Req() request: Request,
+    @Body() openform: openFormDto) 
+      :Promise<any> {
+      const csrfToken = request.csrfToken(); // Genera el token CSRF
+
+    const marca = await this.Service.openForm(openform);
+    return {marca, csrfToken } ;
+  }
   @Get()
   async findItems(@Query() searchDto: ProductSearchDto): Promise<Product[]> {
     return this.Service.findItems(searchDto);

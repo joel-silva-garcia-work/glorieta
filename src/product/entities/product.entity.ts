@@ -3,8 +3,6 @@ import { BasicInformationEntity } from 'src/common/base/entities';
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
   Unique,
 } from 'typeorm';
 
@@ -12,8 +10,10 @@ import {
 @Unique('uk_name_product', ['name'])
 export class Product extends BasicInformationEntity {
 
+  @Column({nullable:true})
   marca: string;
 
+  @Column({nullable:true})
   modelo: string;
 
   @Column({ type: 'text' })
