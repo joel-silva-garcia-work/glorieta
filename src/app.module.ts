@@ -8,8 +8,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from './user/user.module';
 import { RolesModule } from './roles/roles.module';
 import { SectionsModule } from './sections/sections.module';
-import { MarcasModule } from './marcas/marcas.module';
-import { ModelosModule } from './modelos/modelos.module';
 import { CountryModule } from './country/country.module';
 import { ProvinceModule } from './province/province.module';
 import { MunicipalityModule } from './municipality/municipality.module';
@@ -32,8 +30,8 @@ import { ShopModule } from './shop/shop.module';
 import { ShopSectionProductsModule } from './shop-section-products/shop-section-products.module';
 import { ShopSectionsModule } from './shop-sections/shop-sections.module';
 import { TipoCambioModule } from './tipo-cambio/tipo-cambio.module';
-import { TiendaSeccionProductoMarcaModeloViewModule } from './tienda-seccion-producto-marca-modelo-view/tienda-seccion-producto-marca-modelo-view.module';
-
+import { TiendaSeccionProductoViewModule } from './tienda-seccion-producto-marca-modelo-view/tienda-seccion-producto-view.module';
+ 
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -50,8 +48,6 @@ import { TiendaSeccionProductoMarcaModeloViewModule } from './tienda-seccion-pro
     UserModule,
     RolesModule,
     SectionsModule,
-    MarcasModule,
-    ModelosModule,
     CountryModule,
     ProvinceModule,
     MunicipalityModule,
@@ -73,7 +69,7 @@ import { TiendaSeccionProductoMarcaModeloViewModule } from './tienda-seccion-pro
     ShopSectionProductsModule,
     ShopSectionsModule,
     TipoCambioModule,
-    TiendaSeccionProductoMarcaModeloViewModule,
+    TiendaSeccionProductoViewModule,
   ],
   controllers: [],
   providers: [GlobalesService],

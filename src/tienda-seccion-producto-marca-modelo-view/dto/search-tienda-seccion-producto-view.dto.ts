@@ -1,6 +1,6 @@
 import { IsOptional, IsString, IsNumber, IsBoolean } from 'class-validator';
 
-export class SearchTiendaSeccionProductoMarcaModeloDto {
+export class SearchTiendaSeccionProductoDto {
   @IsOptional()
   @IsString()
   readonly shopName?: string;
@@ -18,20 +18,12 @@ export class SearchTiendaSeccionProductoMarcaModeloDto {
   readonly productName?: string;
 
   @IsOptional()
-  @IsNumber()
-  readonly marcasId?: number;
+  @IsString()
+  readonly productMarca?: string;
 
   @IsOptional()
   @IsString()
-  readonly marcasName?: string;
-
-  @IsOptional()
-  @IsNumber()
-  readonly modelosId?: number;
-
-  @IsOptional()
-  @IsString()
-  readonly modelosName?: string;
+  readonly productModelo?: string;
 
   @IsOptional()
   @IsBoolean()

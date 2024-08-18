@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity('tienda_seccion_producto_marca_modelo_view')
-export class TiendaSeccionProductoMarcaModeloView {
+@Entity('tienda_seccion_producto_view')
+export class TiendaSeccionProductoView {
   @PrimaryColumn({ name: 'shop_id' })
   shopId: number;
 
@@ -62,21 +62,11 @@ export class TiendaSeccionProductoMarcaModeloView {
   @Column({ name: 'product_carcteristicas' })
   productCarcteristicas: string;
 
-  @Column({ name: 'marcas_id' })
-  marcasId: number;
 
-  @Column({ name: 'marcas_name' })
-  marcasName: string;
+  @Column({ name: 'product_marca' })
+  productMarca: string;
 
-  @Column({ name: 'marcas_description' })
-  marcasDescription: string;
+  @Column({ name: 'product_modelo' })
+  productModelo: string;
 
-  @Column({ name: 'modelos_id' })
-  modelosId: number;
-
-  @Column({ name: 'modelos_name' })
-  modelosName: string;
-
-  @Column({ name: 'modelos_description' })
-  modelosDescription: string;
 }

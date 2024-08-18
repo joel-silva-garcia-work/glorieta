@@ -19,10 +19,10 @@ export class CreateProductDto {
   @IsString()
   name: string;
 
-  @IsUUID()
+  @IsString()
   marca: string;
 
-  @IsUUID()
+  @IsString()
   modelo: string;
 
   @IsString()

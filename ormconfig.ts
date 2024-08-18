@@ -3,8 +3,6 @@ import * as dotenv from 'dotenv';
 import { Role } from './src/roles/entities/role.entity';
 import { User } from './src/user/entities/user.entity';
 import { Section } from './src/sections/entities/section.entity';
-import { Marca } from './src/marcas/entities/marca.entity';
-import { Modelo } from './src/modelos/entities/modelo.entity';
 import { Country } from './src/country/entities/country.entity';
 import { Province } from './src/province/entities/province.entity';
 import { Municipality } from './src/municipality/entities/municipality.entity';
@@ -24,7 +22,6 @@ import { Shop } from 'src/shop/entities/shop.entity';
 import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-section-product.entity';
 import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
 import { TipoCambio } from 'src/tipo-cambio/entities/tipo-cambio.entity';
-import { TiendaSeccionProductoMarcaModeloView } from 'src/tienda-seccion-producto-marca-modelo-view/entities/tienda-seccion-producto-marca-modelo-view.entity';
 
 dotenv.config(); // Carga las variables de entorno desde el archivo .env
 
@@ -43,8 +40,6 @@ export const config: TypeOrmModuleOptions = {
     Role,
     UserRole,
     Section,
-    Marca,
-    Modelo,
     Country,
     Province,
     Municipality,
