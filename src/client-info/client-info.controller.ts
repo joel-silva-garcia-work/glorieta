@@ -15,6 +15,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { BaseControllerCRUD } from 'src/common/base/class/base.controller.crud.class';
 import { ClientInfoSearchDto } from './dto/client-info-search.dto';
 import { ClientInfo } from './entities/client-info.entity';
+import { ReturnDto } from 'src/common/base/dto';
 
 @ApiTags('Client-Info')
 @Controller('client-info')
@@ -26,10 +27,10 @@ export class ClientInfoController extends BaseControllerCRUD<
   constructor(private readonly Service: ClientInfoService) {
     super(Service);
   }
-  @Get()
+  @Get('items')
   async findItems(
     @Query() searchDto: ClientInfoSearchDto,
-  ): Promise<ClientInfo[]> {
+  ): Promise<ReturnDto> {
     return this.Service.findItems(searchDto);
   }
 }

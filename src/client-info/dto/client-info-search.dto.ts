@@ -1,11 +1,17 @@
 // src/client-info/dto/client-info-search.dto.ts
-import { IsOptional, IsString, IsUUID, IsBoolean, IsNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsOptional, IsString, IsUUID, IsBoolean, IsNotEmpty, IsArray, IsNumber, ValidateNested } from 'class-validator';
+import { OrderByFieldDto } from 'src/common/base/dto/orderByField.dto';
 import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 export class ClientInfoSearchDto {
   @IsOptional()
   @IsString()
   readonly nombre?: string;
+
+  @IsOptional()
+  @IsString()
+  readonly description?: string;
 
   @IsOptional()
   @IsString()
@@ -16,11 +22,29 @@ export class ClientInfoSearchDto {
   readonly municipalityId?: string;
 
   @IsOptional()
+  @IsUUID()
+  readonly municipalityName?: string;
+
+  @IsOptional()
   @IsBoolean()
   readonly actual?: boolean;
 
   @IsOptional()
   @IsString()
-  readonly municipalityName?: string;
+  readonly municipality?: string;
 
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderByFieldDto)
+  orderBy?: OrderByFieldDto[]; // Array de campos y direcciones de ordenamiento
+  
+  @IsOptional()
+  @IsNumber()
+  skip?: number;
+
+  @IsOptional()
+  @IsNumber()
+  take?: number;
+  
 }

@@ -3,13 +3,9 @@ import { Municipality } from 'src/municipality/entities/municipality.entity';
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
   ManyToOne,
-  Index,
 } from 'typeorm';
-import { v4 } from 'uuid';
 
-@Index(v4(), ['email'])
 @Entity('client_info')
 export class ClientInfo extends BasicInformationEntity {
   @Column({ type: 'varchar', length: 255 })

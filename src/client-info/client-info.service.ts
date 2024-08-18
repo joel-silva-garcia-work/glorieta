@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClientInfo } from './entities/client-info.entity';
 import { ClientInfoSearchDto } from './dto/client-info-search.dto';
+import { ReturnDto } from 'src/common/base/dto';
 
 @Injectable()
 export class ClientInfoService extends BaseServiceCRUD<
@@ -20,7 +21,8 @@ export class ClientInfoService extends BaseServiceCRUD<
     super(repository);
   }
 
-  async findItems(searchDto: ClientInfoSearchDto): Promise<ClientInfo[]> {
+  async findItems(searchDto: ClientInfoSearchDto): Promise<ReturnDto> {
+    const returnDto = new ReturnDto();
     const queryBuilder = this.repository
       .createQueryBuilder('clientInfo')
       .leftJoinAndSelect('clientInfo.municipality', 'municipality');
@@ -38,8 +40,8 @@ export class ClientInfoService extends BaseServiceCRUD<
     }
 
     if (searchDto.municipalityId) {
-      queryBuilder.andWhere('clientInfo.municipalityId = :municipalityId', {
-        municipalityId: searchDto.municipalityId,
+      queryBuilder.andWhere('clientInfo.municipality = :municipality', {
+        municipality: searchDto.municipality,
       });
     }
 
@@ -49,12 +51,40 @@ export class ClientInfoService extends BaseServiceCRUD<
       });
     }
 
+    if (searchDto.municipalityId) {
+      queryBuilder.andWhere('clientInfo.municipality LIKE :municipality', {
+        municipality: `%${searchDto.municipalityId}%`,
+      });
+    }
+
     if (searchDto.municipalityName) {
       queryBuilder.andWhere('municipality.name LIKE :municipalityName', {
         municipalityName: `%${searchDto.municipalityName}%`,
       });
     }
 
-    return queryBuilder.getMany();
-  }
+// Aplicar ordenamiento
+if (searchDto.orderBy && searchDto.orderBy.length > 0) {
+  searchDto.orderBy.forEach((orderByField, index) => {
+    if (index === 0) {
+      queryBuilder.orderBy(`product.${orderByField.field}`, orderByField.direction);
+    } else {
+      queryBuilder.addOrderBy(`product.${orderByField.field}`, orderByField.direction);
+    }
+  });
+}
+
+// Aplicar paginación
+const skip = searchDto.skip || 0; // Valor predeterminado de 0 si no se proporciona
+const take = searchDto.take || 10; // Valor predeterminado de 10 si no se proporciona
+
+queryBuilder.skip(this.startPage(skip, take)).take(take);
+
+
+// Verificar la consulta generada para depuración
+console.log(queryBuilder.getSql());
+
+returnDto.data = await queryBuilder.getMany();
+return returnDto;  
+}
 }
