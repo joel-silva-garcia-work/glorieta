@@ -9,6 +9,7 @@ import { ReturnDto } from 'src/common/base/dto';
 import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
 import { CodeEnum } from 'src/common/enum/code.enum';
 import { Product } from 'src/product/entities/product.entity';
+import { ResourceEnum } from 'src/common/enum/resource.enum';
 @Injectable()
 export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProducts,CreateShopSectionProductDto,UpdateShopSectionProductDto> {
   constructor(
@@ -21,48 +22,43 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
   ) {
     super(repository)
   }
-  // override async create(createDto: CreateShopSectionProductDto): Promise<ReturnDto> {
-  //   const returnDto = new ReturnDto;
-  //   // 1 check if shopsection exist
-  //   createDto.ubicaciones.forEach(async (ubicacion)=>{
+  override   async update(updateDto: UpdateShopSectionProductDto): Promise<ReturnDto> {
+    let valid  =true
+    const returnDto = new ReturnDto
+    if (updateDto.rules) {
+      valid= await this._validate(updateDto);
+    } 
+    if(valid) {
+      try {
+        const object = await this.repository.findOne({
+          where: {
+            id: updateDto.id,
+          },
+        });
+        if (!object) {
+          returnDto.isSuccess = false;
+          returnDto.returnCode = CodeEnum.BAD_REQUEST;
+          // traducir
+          returnDto.errorMessage = ResourceEnum.ENTITY_NOT_FOUND;
 
-  //     try {
-  //       const shopSection = await this.shopSectionRepository.findOne({
-  //        where:{
-  //          id: ubicacion.shopSection
-  //        }
-  //      }) 
+          returnDto.errorMessage = '';
+        } else {
+          returnDto.data = await this.repository.save({
 
-  //      const product = await this.productRepository.findOne({
-  //       where:{
-  //         id: ubicacion.product
-  //       }
-  //     }) 
-      
-  //     // salvo y que el error lo devuelva la BD por ahora
-  //     // const element = new ShopSectionProducts();
-  //     // element.product = product
-  //     // element.shopSection = shopSection
-  //     // element.price = ubicacion.price
-  //     // element.existence = ubicacion.existence
-  //     // element.caracteristicas = ubicacion.caracteristcas as any 
-  //     await this.repository.save({
-  //       product: product,
-  //       shopSection: shopSection,
-  //       price: ubicacion.price,
-  //       existence: ubicacion.existence,
-  //       caracteristicas: ubicacion.caracteristcas 
-  //     })  
-      
-  //     } catch (error) {
-  //       returnDto.isSuccess = false
-  //       returnDto.returnCode = CodeEnum.BAD_REQUEST
-  //       returnDto.errorMessage = error.message
-  //     }
-  //   //  returnDto.data = result
-  //   })
+          });
+        }
+      } catch (error) {
+        returnDto.isSuccess = false;
+        returnDto.errorMessage = error.message;
+        returnDto.returnCode = error.code;
+      }
+    } else {
+      returnDto.isSuccess = false;
+      returnDto.returnCode = CodeEnum.BAD_REQUEST;
+      returnDto.errorMessage = ResourceEnum.ALREADY_EXST;
+    }
+    return returnDto;
+  }
 
-  //   return returnDto
-      
-  // }
+
 }

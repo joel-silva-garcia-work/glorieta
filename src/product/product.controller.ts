@@ -7,7 +7,6 @@ import { BaseControllerCRUD } from 'src/common/base/class/base.controller.crud.c
 import { ProductSearchDto } from './dto/product-search.dto';
 import { Product } from './entities/product.entity';
 import { ReturnDto } from 'src/common/base/dto';
-import { UpdateExistenceDto } from '../shop-section-products/dto/update-existence.dto';
 import { openFormDto } from 'src/common/base/dto/open-form.dto';
 import { Request, Response } from 'express';
 
@@ -32,17 +31,5 @@ export class ProductController extends BaseControllerCRUD<CreateProductDto,Updat
   async findItems(@Body() searchDto: ProductSearchDto): Promise<ReturnDto> {
     return this.Service.findItems(searchDto) ;
   }
-  @Post('/ubicar')
-  async ubicar(updateDto: UpdateProductDto): Promise<ReturnDto>{
-    return this.Service.updateDetail(updateDto);
-  }
-  @Post('/updateDetail')
-  async updateDetail(updateDto: UpdateProductDto): Promise<ReturnDto>{
-    return this.Service.updateDetail(updateDto);
-  }
-  @Post('/updateExistence')  
-  async updateExistence(updateDto: UpdateExistenceDto): Promise<ReturnDto>{
-    return this.Service.updateExistence (updateDto);
-  }
-  
+
 }

@@ -12,6 +12,7 @@ import { CreateShopSectionProductDto } from './dto/create-shop-section-product.d
 import { UpdateShopSectionProductDto } from './dto/update-shop-section-product.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { BaseControllerCRUD } from 'src/common/base/class/base.controller.crud.class';
+import { ReturnDto } from 'src/common/base/dto';
 
 @ApiTags('Shop Section Products')
 @Controller('shop-section-products')
@@ -22,5 +23,10 @@ export class ShopSectionProductsController extends BaseControllerCRUD<
 > {
   constructor(private readonly Service: ShopSectionProductsService) {
     super(Service);
+  }
+
+  @Patch()  
+  override async update(updateDto: UpdateShopSectionProductDto): Promise<ReturnDto>{
+    return this.Service.update(updateDto);
   }
 }

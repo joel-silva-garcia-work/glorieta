@@ -14,7 +14,6 @@ import { ResourceEnum } from 'src/common/enum/resource.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-section-product.entity';
 import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
-import { UpdateExistenceDto } from '../shop-section-products/dto/update-existence.dto';
 import { BaseDto } from 'src/common/base/dto/base.crud.dto';
 import { ValidateScenarioDto } from 'src/common/base/dto/validate.scenario.dto';
 import { ClassValidator } from 'src/common/base/validator/class.validator';
@@ -163,39 +162,7 @@ export class ProductService extends BaseServiceCRUD<
     }
     return returnDto;
   }
-  async updateExistence(updateDto: UpdateExistenceDto): Promise<ReturnDto> {
-    const returnDto: ReturnDto = new ReturnDto();
-    let valid = true;
-    if (valid) {
-      try {
-        
-        const product = await this.shopSectionProductRepository.findOne({
-          where:{
-            id: updateDto.id
-          }
-        });
-        if(product){
-          product.existence = updateDto.ubicacion.existence;
-          product.price = updateDto.ubicacion.price;
-          returnDto.data = await this.shopSectionProductRepository.save(product);
-        }
-        else {
-          returnDto.isSuccess = false;
-          returnDto.returnCode = CodeEnum.BAD_REQUEST;
-          returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_FOUND;
-        } 
-      } catch (error) {
-        returnDto.isSuccess = false;
-        returnDto.errorMessage = error.message;
-        returnDto.returnCode = error.code;
-      }
-    } else {
-      returnDto.isSuccess = false;
-      returnDto.returnCode = CodeEnum.BAD_REQUEST;
-      returnDto.errorMessage = ResourceEnum.ALREADY_EXST;
-    }
-    return returnDto;
-  }
+
 
   async saveProductImage(base64Image: string): Promise<string> {
     const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '');
