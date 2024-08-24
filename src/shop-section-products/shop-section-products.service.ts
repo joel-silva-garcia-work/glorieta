@@ -10,6 +10,7 @@ import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
 import { CodeEnum } from 'src/common/enum/code.enum';
 import { Product } from 'src/product/entities/product.entity';
 import { ResourceEnum } from 'src/common/enum/resource.enum';
+import { ProductLocations } from './dto/product-locations.dto';
 @Injectable()
 export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProducts,CreateShopSectionProductDto,UpdateShopSectionProductDto> {
   constructor(
@@ -60,5 +61,32 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
     return returnDto;
   }
 
+  async findShopsByProductId(productLocations: ProductLocations): Promise<ReturnDto> {
+    // Fetch shop section products for the given product
+    const returnDto = new ReturnDto
+    const productId = productLocations.product
+    const shopSectionProducts = await this.repository
+      .createQueryBuilder('shopSectionProduct')
+      .leftJoinAndSelect('shopSectionProduct.shopSection', 'shopSection')
+      .leftJoinAndSelect('shopSection.shop', 'shop')
+      .where('shopSectionProduct.productId = :productId', { productId })
+      .select([
+        'shop.id AS shopId',
+        'shop.name AS shopName',
+        'shopSection.id AS sectionId',
+        'shopSectionProduct.id AS shopSectionProductId',
+        'shopSectionProduct.existence AS existence',
+      ])
+      .getRawMany();
+
+      returnDto.data = shopSectionProducts.map((result) => ({
+        shopId: result.shopId,
+        shopName: result.shopName,
+        sectionId: result.sectionId,
+        shopSectionProductId: result.shopSectionProductId,
+        existence: result.existence,
+      }));
+    return returnDto
+  }
 
 }

@@ -5,9 +5,9 @@ import { OrderStates } from 'src/order-state/entities/order-state.entity';
 import { Shop } from 'src/shop/entities/shop.entity';
 
 @Entity('order')
-export class Order  extends BasicEntity {
+export class Order extends BasicEntity {
   
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255,unique:true })
   noOrden: string;
 
   @ManyToOne(() => Shop, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
@@ -29,8 +29,9 @@ export class Order  extends BasicEntity {
   totalProductsPrices: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  totalOrderPrice: number;
+  totalPrice: number;
 
   @Column({ type: 'varchar', length: 10, nullable: true })
   fechaOrder: string;
+
 }

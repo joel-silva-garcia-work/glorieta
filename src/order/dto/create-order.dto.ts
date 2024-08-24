@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsUUID,
@@ -6,41 +7,47 @@ import {
   IsNumber,
   IsOptional,
   IsNotEmpty,
+  ValidateNested,
+  IsBoolean,
 } from 'class-validator';
 import { RulesDto } from 'src/common/base/dto/rules.dto';
-export class CreateOrderDto {
-  @IsUUID()
+
+export class ProductDto {
   @IsString()
-  @IsOptional()
-  id?: string;
-
-  @IsString()
-  noOrden: string;
-
-  @IsUUID()
-  shopId: string;
-
-  @IsUUID()
-  deliveryId: string;
+  @IsNotEmpty()
+  shopSectionProductId: string;
 
   @IsNumber()
-  deliveryTravels: number;
+  quantity: number;
+}
 
-  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
-  deliveryTotalPrice: number;
+export class OrderDto {
+  @ValidateNested({ each: true })
+  @Type(() => ProductDto)
+  products: ProductDto[];
 
-  @IsUUID()
-  orderStateId: string;
-
-  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
-  totalProductsPrices: number;
-
-  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
-  totalOrderPrice: number;
-
-  @IsOptional()
   @IsString()
-  fechaOrder?: string;
+  municipalityOrigin?: string;
+
+  @IsString()
+  municipalityDestiny?: string;
+}
+
+export class CreateOrderDto {
+
+  @ApiProperty()
+  @IsUUID()
+  @IsString()
+  shop: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  toDelivery: boolean;
+
+  @ApiProperty()
+  @ValidateNested({ each: true })
+  @Type(() => OrderDto)
+  orders: OrderDto[];
 
   @ApiProperty()
   @IsNotEmpty()
