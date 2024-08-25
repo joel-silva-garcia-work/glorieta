@@ -23,17 +23,18 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
   ) {
     super(repository)
   }
+
   override   async update(updateDto: UpdateShopSectionProductDto): Promise<ReturnDto> {
     let valid  =true
     const returnDto = new ReturnDto
-    if (updateDto.rules) {
-      valid= await this._validate(updateDto);
-    } 
+    // if (updateDto.rules) {
+    //   valid= await this._validate(updateDto);
+    // } 
     if(valid) {
       try {
         const object = await this.repository.findOne({
           where: {
-            id: updateDto.id,
+            id: updateDto.id
           },
         });
         if (!object) {
@@ -89,4 +90,42 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
     return returnDto
   }
 
+  override async create(dto: CreateShopSectionProductDto): Promise<ReturnDto> {
+    const results: ShopSectionProducts[] = [];
+    const returnDto: ReturnDto = new ReturnDto;
+
+    for (const detail of dto.shopSectionDetails) {
+      const { shopSection, details } = detail;
+
+      const product = await this.productRepository.findOne({
+        where:
+        {
+          id: dto.product
+        }
+      });
+      const shopSectionEntity = await this.shopSectionRepository.findOne({
+        where:{
+          id: shopSection
+        }
+      });
+
+      if (!product || !shopSectionEntity) {
+        throw new Error('Product or Shop Section not found.');
+      }
+
+      const shopSectionProduct = new ShopSectionProducts();
+      shopSectionProduct.product = product;
+      shopSectionProduct.shopSection = shopSectionEntity;
+      shopSectionProduct.price = details.price;
+      shopSectionProduct.existence = details.existence;
+      shopSectionProduct.caracteristicas = details.caracteristcas;
+      // shopSectionProduct.rules = dto.rules; // Assuming RulesDto can be directly assigned
+
+      const savedProduct = await this.repository.save(shopSectionProduct);
+      results.push(savedProduct);
+    }
+
+    returnDto.data = results
+    return returnDto;
+  }
 }

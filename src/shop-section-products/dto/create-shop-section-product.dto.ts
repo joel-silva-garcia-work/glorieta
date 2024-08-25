@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsUUID,
-  IsNumber,
   IsOptional,
   IsString,
   IsNotEmpty,
@@ -9,11 +8,34 @@ import {
   IsInt,
   Min,
   ArrayMinSize,
+  ValidateNested,
+  IsArray,
+  ArrayMaxSize,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { RulesDto } from 'src/common/base/dto/rules.dto';
 import { LocateProductDto } from './locate-product.dto';
 
-export class CreateShopSectionProductDto extends LocateProductDto{
+class ShopSectionProductDetailDto {
+  @ApiProperty()
+  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
+  @Min(1)
+  price: number;
+
+  @ApiProperty()
+  @IsInt()
+  @Min(0)
+  existence: number;
+
+  @ApiProperty({
+    isArray: true,
+  })
+  @ArrayMinSize(1)
+  @ArrayMaxSize(7)
+  caracteristcas: Record<string, any>[];
+}
+
+export class CreateShopSectionProductDto extends LocateProductDto {
   @IsUUID()
   @IsString()
   @IsOptional()
@@ -24,27 +46,18 @@ export class CreateShopSectionProductDto extends LocateProductDto{
   @IsString()
   product: string;
 
-  @IsUUID()
-  @IsString()
-  shopSection: string;
-
-  @ApiProperty()
-  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
-  @Min(1)  // Asegura que el precio sea al menos 1
-  price: number;
-
-  @ApiProperty()
-  @IsInt()
-  @Min(0)  // Asegura que la existencia sea al menos 0
-  existence: number;
-
   @ApiProperty({
-    isArray: true,
+    type: [ShopSectionProductDetailDto],
   })
-  @ArrayMinSize(1)  // Asegura que el arreglo tenga al menos un elemento
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => ShopSectionProductDetailDto)
+  shopSectionDetails: {
+    shopSection: string;
+    details: ShopSectionProductDetailDto;
+  }[];
 
-  caracteristcas:Record<string, any>[]
-  
   @ApiProperty()
   @IsNotEmpty()
   rules: RulesDto;
