@@ -10,6 +10,10 @@ import { ReturnDto } from 'src/common/base/dto';
 import { OrderProductDelivery } from 'src/order-product-delivery/entities/order-product-delivery.entity';
 import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-section-product.entity';
 import { Deliveries } from 'src/delivery/entities/delivery.entity';
+import { CodeEnum } from 'src/common/enum/code.enum';
+import { ResourceEnum } from 'src/common/enum/resource.enum';
+import { Municipality } from 'src/municipality/entities/municipality.entity';
+import { Product } from 'src/product/entities/product.entity';
 @Injectable()
 export class OrderService extends BaseServiceCRUD<
   Order,
@@ -25,8 +29,12 @@ export class OrderService extends BaseServiceCRUD<
     private readonly orderProductDeliveryRepository: Repository<OrderProductDelivery>,
     @InjectRepository(ShopSectionProducts)
     private readonly shopSectionProductRepository: Repository<ShopSectionProducts>,
+    @InjectRepository(Municipality)
+    private readonly municipalityRepository: Repository<Municipality>,
     @InjectRepository(Deliveries)
     private readonly deliveryRepository: Repository<Deliveries>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
   ) {
     super(repository);
   }
@@ -55,39 +63,95 @@ export class OrderService extends BaseServiceCRUD<
 
   override async create(createOrderDto: CreateOrderDto): Promise<ReturnDto> {
     const returnDto = new ReturnDto
-      const { orders, toDelivery, shop } = createOrderDto;
-  
+
+    const order = new Order();
+
+    order.totalPrice = 0;
+    order.deliveryTotalPrice = 0
+    order.totalProductsPrices = 0
+    order.delivery = null
+    order.noOrden = await this.generateOrderNumber()
+    // Calculate delivery cost if toDelivery is true
+     if (createOrderDto.toDelivery) {
+      if(!createOrderDto.municipalityOrigin || ! createOrderDto.municipalityDestiny)
+      {
+        returnDto.isSuccess = false
+        returnDto.returnCode = CodeEnum.BAD_REQUEST
+        returnDto.errorMessage = 'At least one municipality is not setted'
+      }
+      else{
+        const municipalityOrigin = await this.municipalityRepository.findOne({
+          where:{
+            id : createOrderDto.municipalityOrigin
+          }
+        })
+      if(!municipalityOrigin)
+      {
+        returnDto.isSuccess = false
+        returnDto.returnCode = CodeEnum.BAD_REQUEST
+        returnDto.errorMessage = 'Origin municipality is wrong.'
+      }
+        const municipalityDestiny = await this.municipalityRepository.findOne({
+          where:{
+            id : createOrderDto.municipalityDestiny
+          }
+        })
+      if(!municipalityDestiny)
+        {
+          returnDto.isSuccess = false
+          returnDto.returnCode = CodeEnum.BAD_REQUEST
+          returnDto.errorMessage = 'Destiny municipality is wrong.'
+        }
+        if(municipalityOrigin && municipalityDestiny){
+        const delivery = await this.deliveryRepository.findOne({
+          where: {
+            municipalityOrigin: municipalityOrigin,
+            municipalityDestiny: municipalityDestiny,
+          },
+        });
+         if (delivery) {
+          order.totalPrice += delivery.price;
+          order.deliveryTotalPrice += delivery.price
+          order.delivery = delivery  
+        }
+      }  
+    }
+    }
+
+
       // Verify that all orders are from the same shop
-      for (const orderDto of orders) {
-        for (const productDto of orderDto.products) {
+
+      createOrderDto.products.forEach  (async (productDto)=> {
           const shopSectionProduct = await this.shopSectionProductRepository.findOne({
             where: { id: productDto.shopSectionProductId },
           });
-  
+
           if (!shopSectionProduct) {
-            throw new NotFoundException(`ShopSectionProduct with ID ${productDto.shopSectionProductId} not found.`);
+            returnDto.isSuccess = false
+            returnDto.returnCode = CodeEnum.BAD_REQUEST
+            returnDto.errorMessage = `ShopSectionProduct with ID ${productDto.shopSectionProductId} not found.`
           }
   
-          if (shopSectionProduct.shopSection.shop.id !== shop) {
-            throw new BadRequestException(`ShopSectionProduct with ID ${productDto.shopSectionProductId} does not belong to shop ${shop}.`);
+          else if (shopSectionProduct.shopSection.shop.id !== createOrderDto.shop) {
+            returnDto.isSuccess = false
+            returnDto.returnCode = CodeEnum.BAD_REQUEST
+            returnDto.errorMessage = `ShopSectionProduct with ID ${productDto.shopSectionProductId} does not belong to shop ${createOrderDto.shop}.`
           }
-        }
-      }
+          // buscar los Productos
+            order.totalProductsPrices += shopSectionProduct.price * productDto.quantity
+        })
+      
   
-      const order = new Order();
-      order.noOrden = await this.generateOrderNumber()
-      order.totalPrice = 0; // Start with a total price of 0
-  
+   
       // Save the initial order
       const savedOrder = await this.repository.save(order);
   
       // Initialize total price
       let totalProductPrice = 0;
   
-      // Process each orderDto
-      for (const orderDto of orders) {
+    
         // Process each product in the orderDto
-        for (const productDto of orderDto.products) {
+        for (const productDto of createOrderDto.products) {
           // Fetch the ShopSectionProduct
           const shopSectionProduct = await this.shopSectionProductRepository.findOne({
             where: { id: productDto.shopSectionProductId },
@@ -101,10 +165,6 @@ export class OrderService extends BaseServiceCRUD<
           shopSectionProduct.existence -= productDto.quantity;
           await this.shopSectionProductRepository.save(shopSectionProduct);
   
-          // Calculate the price of the products
-          const productPrice = shopSectionProduct.price * productDto.quantity;
-          totalProductPrice += productPrice;
-  
           // Create OrderProductDelivery
           const orderProductDelivery = new OrderProductDelivery();
           orderProductDelivery.amountProduct = productDto.quantity;
@@ -112,24 +172,10 @@ export class OrderService extends BaseServiceCRUD<
           orderProductDelivery.shopSectionProduct = shopSectionProduct;
           await this.orderProductDeliveryRepository.save(orderProductDelivery);
         }
-      }
+      
   
       // Add product prices to totalPrice
       savedOrder.totalPrice += totalProductPrice;
-  
-      // Calculate delivery cost if toDelivery is true
-      if (toDelivery) {
-        const delivery = await this.deliveryRepository.findOne({
-          where: {
-            municipalityOrigin: orders[0]?.municipalityOrigin as any,
-            municipalityDestiny: orders[0]?.municipalityDestiny as any,
-          },
-        });
-  
-        if (delivery) {
-          savedOrder.totalPrice += delivery.price;
-        }
-      }
   
       // Save the updated order with totalPrice
       await this.repository.save(savedOrder);

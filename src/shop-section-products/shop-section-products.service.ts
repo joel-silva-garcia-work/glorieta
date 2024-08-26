@@ -109,10 +109,18 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
         }
       });
 
-      if (!product || !shopSectionEntity) {
-        throw new Error('Product or Shop Section not found.');
+      if(shopSectionEntity.shop != dto.shop as any){
+        returnDto.isSuccess = false
+        returnDto.returnCode = CodeEnum.BAD_REQUEST
+        returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_EQUALS
       }
 
+      else if (!product || !shopSectionEntity) {
+        returnDto.isSuccess = false
+        returnDto.returnCode = CodeEnum.BAD_REQUEST
+        returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_FOUND
+      }
+      else {
       const shopSectionProduct = new ShopSectionProducts();
       shopSectionProduct.product = product;
       shopSectionProduct.shopSection = shopSectionEntity;
@@ -122,10 +130,12 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
       // shopSectionProduct.rules = dto.rules; // Assuming RulesDto can be directly assigned
 
       const savedProduct = await this.repository.save(shopSectionProduct);
-      results.push(savedProduct);
+      results.push(savedProduct); 
+       
+      }
+      returnDto.data = results
     }
 
-    returnDto.data = results
     return returnDto;
   }
 }

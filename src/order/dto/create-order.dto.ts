@@ -21,18 +21,6 @@ export class ProductDto {
   quantity: number;
 }
 
-export class OrderDto {
-  @ValidateNested({ each: true })
-  @Type(() => ProductDto)
-  products: ProductDto[];
-
-  @IsString()
-  municipalityOrigin?: string;
-
-  @IsString()
-  municipalityDestiny?: string;
-}
-
 export class CreateOrderDto {
 
   @ApiProperty()
@@ -44,12 +32,15 @@ export class CreateOrderDto {
   @IsBoolean()
   toDelivery: boolean;
 
-  @ApiProperty()
-  @ValidateNested({ each: true })
-  @Type(() => OrderDto)
-  orders: OrderDto[];
+  @IsString()
+  municipalityOrigin?: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  rules: RulesDto;
+  @IsString()
+  municipalityDestiny?: string;
+
+  @ValidateNested({ each: true })
+  @Type(() => ProductDto)
+  products: ProductDto[];
+
+
 }

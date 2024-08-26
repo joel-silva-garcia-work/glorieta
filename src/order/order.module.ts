@@ -9,6 +9,10 @@ import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-sec
 import { ShopSectionProductsModule } from 'src/shop-section-products/shop-section-products.module';
 import { Deliveries } from 'src/delivery/entities/delivery.entity';
 import { DeliveryModule } from 'src/delivery/delivery.module';
+import { Municipality } from 'src/municipality/entities/municipality.entity';
+import { MunicipalityModule } from 'src/municipality/municipality.module';
+import { Product } from 'src/product/entities/product.entity';
+import { ProductModule } from 'src/product/product.module';
 
 @Module({
   imports: [
@@ -16,9 +20,14 @@ import { DeliveryModule } from 'src/delivery/delivery.module';
       Order,
       OrderProductDelivery,
       ShopSectionProducts, 
-      Deliveries]),    
+      Deliveries,
+      Municipality,
+      Product
+    ]),    
     forwardRef(() => OrderProductDeliveryModule),
     forwardRef(() => ShopSectionProductsModule),
+    forwardRef(() => MunicipalityModule),
+    forwardRef(() => ProductModule),
     forwardRef(() => DeliveryModule),
 
 ],

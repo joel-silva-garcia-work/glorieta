@@ -18,12 +18,6 @@ export class Deliveries extends BasicEntity {
   @ManyToOne(() => Municipality, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
   municipalityDestiny: Municipality;
 
-  @ManyToOne(() => DeliveryState, {
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  deliveryState: DeliveryState;
-
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 }

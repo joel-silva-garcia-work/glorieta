@@ -16,8 +16,8 @@ export class Order extends BasicEntity {
   @ManyToOne(() => Deliveries, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
   delivery: Deliveries;
 
-  @Column({ type: 'int' })
-  deliveryTravels: number;
+  // @Column({ type: 'int' })
+  // deliveryTravels: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   deliveryTotalPrice: number;

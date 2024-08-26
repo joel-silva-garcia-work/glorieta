@@ -45,6 +45,11 @@ export class CreateShopSectionProductDto extends LocateProductDto {
   @IsUUID()
   @IsString()
   product: string;
+  
+  @ApiProperty()
+  @IsUUID()
+  @IsString()
+  shop: string;
 
   @ApiProperty({
     type: [ShopSectionProductDetailDto],
