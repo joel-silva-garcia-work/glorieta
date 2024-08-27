@@ -6,12 +6,13 @@ import { ShopSectionProducts } from 'src/shop-section-products/entities/shop-sec
 
 @Entity('order_product_delivery')
 export class OrderProductDelivery extends BasicEntity {
-  @ManyToOne(() => Order, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+  @ManyToOne(() => Order, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT', eager: true })
   order: Order;
 
   @ManyToOne(() => ShopSectionProducts, {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
+    eager: true
   })
   shopSectionProduct: ShopSectionProducts;
 

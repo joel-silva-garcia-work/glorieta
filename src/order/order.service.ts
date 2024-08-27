@@ -3,7 +3,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseServiceCRUD } from 'src/common/base/class/base.service.crud.class';
-import { Like, Repository } from 'typeorm';
+import { Like, Repository, Unique } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { OrderSearchDto } from './dto/order-search.dto';
 import { ReturnDto } from 'src/common/base/dto';
@@ -14,6 +14,7 @@ import { CodeEnum } from 'src/common/enum/code.enum';
 import { ResourceEnum } from 'src/common/enum/resource.enum';
 import { Municipality } from 'src/municipality/entities/municipality.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { UUID } from 'typeorm/driver/mongodb/bson.typings';
 @Injectable()
 export class OrderService extends BaseServiceCRUD<
   Order,
@@ -71,6 +72,9 @@ export class OrderService extends BaseServiceCRUD<
     order.totalProductsPrices = 0
     order.delivery = null
     order.noOrden = await this.generateOrderNumber()
+    order.fechaOrder = new Date().getDate().toString()
+    let savedOrder = await this.repository.save(order)
+    let totalProductPrice = 0
     // Calculate delivery cost if toDelivery is true
      if (createOrderDto.toDelivery) {
       if(!createOrderDto.municipalityOrigin || ! createOrderDto.municipalityDestiny)
@@ -118,9 +122,7 @@ export class OrderService extends BaseServiceCRUD<
     }
     }
 
-
       // Verify that all orders are from the same shop
-
       createOrderDto.products.forEach  (async (productDto)=> {
           const shopSectionProduct = await this.shopSectionProductRepository.findOne({
             where: { id: productDto.shopSectionProductId },
@@ -131,52 +133,61 @@ export class OrderService extends BaseServiceCRUD<
             returnDto.returnCode = CodeEnum.BAD_REQUEST
             returnDto.errorMessage = `ShopSectionProduct with ID ${productDto.shopSectionProductId} not found.`
           }
-  
-          else if (shopSectionProduct.shopSection.shop.id !== createOrderDto.shop) {
+          else{
+            const shopSection = shopSectionProduct.shopSection
+            console.log(shopSection)
+          if (shopSection.shop.id !== createOrderDto.shop) {
             returnDto.isSuccess = false
             returnDto.returnCode = CodeEnum.BAD_REQUEST
             returnDto.errorMessage = `ShopSectionProduct with ID ${productDto.shopSectionProductId} does not belong to shop ${createOrderDto.shop}.`
           }
-          // buscar los Productos
-            order.totalProductsPrices += shopSectionProduct.price * productDto.quantity
-        })
-      
-  
-   
-      // Save the initial order
-      const savedOrder = await this.repository.save(order);
-  
-      // Initialize total price
-      let totalProductPrice = 0;
-  
-    
-        // Process each product in the orderDto
-        for (const productDto of createOrderDto.products) {
-          // Fetch the ShopSectionProduct
-          const shopSectionProduct = await this.shopSectionProductRepository.findOne({
-            where: { id: productDto.shopSectionProductId },
-          });
-  
-          if (!shopSectionProduct) {
-            throw new NotFoundException(`ShopSectionProduct with ID ${productDto.shopSectionProductId} not found.`);
-          }
-  
-          // Update the quantity in ShopSectionProduct
+        }
+      })
+
+      // verify Existence
+      createOrderDto.products.forEach  (async (productDto)=> {
+        const shopSectionProduct = await this.shopSectionProductRepository.findOne({
+          where: { id: productDto.shopSectionProductId },
+        });
+
+        if (shopSectionProduct.existence < productDto.quantity) {
+          returnDto.isSuccess = false
+          returnDto.returnCode = CodeEnum.BAD_REQUEST
+          returnDto.errorMessage = `Can not be selled this cuantity of product.`
+        }
+
+    })
+
+       // buscar los Productos
+       if(returnDto.isSuccess){
+        createOrderDto.products.forEach  (async (productDto)=> {
+            const shopSectionProduct = await this.shopSectionProductRepository.findOne({
+              where: { id: productDto.shopSectionProductId },
+            });
+
+            order.totalProductsPrices += shopSectionProduct.price * productDto.quantity 
+            totalProductPrice += order.totalProductsPrices
+            savedOrder = await this.repository.save(order)
+                      // Update the quantity in ShopSectionProduct
           shopSectionProduct.existence -= productDto.quantity;
           await this.shopSectionProductRepository.save(shopSectionProduct);
   
-          // Create OrderProductDelivery
           const orderProductDelivery = new OrderProductDelivery();
           orderProductDelivery.amountProduct = productDto.quantity;
           orderProductDelivery.order = savedOrder;
+          orderProductDelivery.fechaEntrega = createOrderDto.fechaEntrega;
           orderProductDelivery.shopSectionProduct = shopSectionProduct;
+          // Estado Reservado
+          orderProductDelivery.deliveryState = "ce6b4846-6e09-4c4b-8d0f-5ac96d7e7256" as any
           await this.orderProductDeliveryRepository.save(orderProductDelivery);
-        }
+        })
+       }
       
-  
       // Add product prices to totalPrice
       savedOrder.totalPrice += totalProductPrice;
   
+      // Estado Id Solicitada
+      savedOrder.orderState = ("34ef12a0-79bd-4078-80c2-33fae602225c") as any
       // Save the updated order with totalPrice
       await this.repository.save(savedOrder);
   

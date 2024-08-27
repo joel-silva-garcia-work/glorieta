@@ -9,6 +9,7 @@ import {
   IsNotEmpty,
   ValidateNested,
   IsBoolean,
+  IsDate,
 } from 'class-validator';
 import { RulesDto } from 'src/common/base/dto/rules.dto';
 
@@ -34,6 +35,10 @@ export class CreateOrderDto {
 
   @IsString()
   municipalityOrigin?: string;
+
+  @IsString()
+  // @IsDate({})
+  fechaEntrega: string;
 
   @IsString()
   municipalityDestiny?: string;
