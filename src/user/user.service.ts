@@ -11,6 +11,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from '../roles/entities/role.entity';
+import { ReturnDto } from 'src/common/base/dto';
+import { CodeEnum } from 'src/common/enum/code.enum';
 
 @Injectable()
 export class UserService {
@@ -118,32 +120,43 @@ export class UserService {
     return await this.userRepository.remove(user);
   }
 
-  async createUser(dto: CreateUserDto): Promise<any> {
+  async createUser(dto: CreateUserDto): Promise<ReturnDto> {
+
+    const returnDto: ReturnDto = new ReturnDto
+
     // busco si existe el usuario por el email
     const user = await this.findOneByUserName(dto.username);
     if (user) {
-      throw new ConflictException(
-        `Exist a user with the username: ${dto.username}. `,
-      );
+      returnDto.isSuccess = false
+      returnDto.returnCode = CodeEnum.BAD_REQUEST
+      returnDto.errorMessage =  `Exist a user with the username: ${dto.username}. `
     }
-    const hash = await argon.hash(dto.password);
-    // Done
-    const role = await this.roleRepository.findOneBy({});
+    else{
+      const hash = await argon.hash(dto.password);
+      // Done
+      const role = await this.roleRepository.findOne({
+        where:{
+          id: dto.role
+        }
+      });    
 
-    if (!role) {
-      throw new ConflictException(
-        `Does not exist a role with id: ${dto.role}. `,
-      );
+      if (!role) {
+        returnDto.isSuccess = false
+        returnDto.returnCode = CodeEnum.BAD_REQUEST
+        returnDto.errorMessage =  `Does not exist a role with id: ${dto.role}.`
+      }
+      else{
+        // inserto el nuevo usuario
+        const saved = await this.userRepository.save({
+          username: dto.username,
+          hash: hash,
+          role: role,
+        });  
+        delete saved.hash;
+        returnDto.data = saved      
+      }
+
     }
-    // inserto el nuevo usuario
-    const saved = await this.userRepository.save({
-      username: dto.username,
-      hash: hash,
-      role: role,
-    });
-
-    delete saved.hash;
-
-    return saved;
+    return returnDto;
   }
 }

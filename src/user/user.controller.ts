@@ -17,6 +17,7 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
+import { ReturnDto } from 'src/common/base/dto';
 
 @UseGuards(JwtGuard)
 @ApiTags('Users')
@@ -38,7 +39,7 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @Post('/adduser')
-  async addUser(@GetUserAdmin() user: User, @Body() dto: CreateUserDto) {
+  async addUser(@GetUserAdmin() user: User, @Body() dto: CreateUserDto):Promise<ReturnDto> {
     return this.userService.createUser(dto);
   }
 

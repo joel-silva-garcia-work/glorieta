@@ -19,7 +19,7 @@ export class User extends BasicEntity {
   username: string;
 
   @Column({ nullable: true })
-  lastname: string;
+  lastName: string;
 
   @Column({ nullable: true })
   phone: string;
