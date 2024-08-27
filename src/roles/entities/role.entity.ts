@@ -1,5 +1,5 @@
 import { BasicEntity } from 'src/common/base/entities';
-import { UserRole } from 'src/user-roles/entities/user-role.entity';
+import { User } from 'src/user/entities/user.entity';
 import { Entity, Column, OneToMany } from 'typeorm';
 
 /*
@@ -13,8 +13,8 @@ export class Role extends BasicEntity {
   @Column()
   description: string;
 
-  @OneToMany(() => UserRole, (userRoles) => userRoles.role, {
+  @OneToMany(() => User, (user) => user.role, {
     cascade: true,
   })
-  userRoles: UserRole[];
+  users: User[];
 }

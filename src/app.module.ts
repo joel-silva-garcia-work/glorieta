@@ -12,7 +12,6 @@ import { CountryModule } from './country/country.module';
 import { ProvinceModule } from './province/province.module';
 import { MunicipalityModule } from './municipality/municipality.module';
 import { TranslateModule } from './translate/translate.module';
-import { UserRolesModule } from './user-roles/user-roles.module';
 import { TrazasModule } from './trazas/trazas.module';
 import { GlobalesService } from './globales/globales.service';
 import { GlobalesModule } from './globales/globales.module';
@@ -52,7 +51,6 @@ import { TiendaSeccionProductoViewModule } from './tienda-seccion-producto-marca
     ProvinceModule,
     MunicipalityModule,
     TranslateModule,
-    UserRolesModule,
     TrazasModule,
     GlobalesModule,
     ConfiguracionModule,

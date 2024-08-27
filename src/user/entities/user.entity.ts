@@ -1,6 +1,6 @@
-import { Entity, Column, OneToMany } from 'typeorm';
-import { UserRole } from 'src/user-roles/entities/user-role.entity';
+import { Entity, Column, ManyToOne } from 'typeorm';
 import { BasicEntity } from 'src/common/base/entities/basic.entity';
+import { Role } from 'src/roles/entities/role.entity';
 
 @Entity('users')
 export class User extends BasicEntity {
@@ -24,9 +24,6 @@ export class User extends BasicEntity {
   @Column({ nullable: true })
   phone: string;
 
-  @OneToMany(() => UserRole, (userRoles) => userRoles.user, {
-    eager: true,
-    cascade: true,
-  })
-  userRoles: UserRole[];
+  @ManyToOne(() => Role, { eager: true })
+  role: Role;
 }

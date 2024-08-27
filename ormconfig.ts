@@ -6,7 +6,6 @@ import { Section } from './src/sections/entities/section.entity';
 import { Country } from './src/country/entities/country.entity';
 import { Province } from './src/province/entities/province.entity';
 import { Municipality } from './src/municipality/entities/municipality.entity';
-import { UserRole } from './src/user-roles/entities/user-role.entity';
 import { Configuracion } from './src/configuracion/entities/configuracion.entity';
 import { Traza } from 'src/trazas/entities/traza.entity';
 import { Currency } from 'src/currency/entities/currency.entity';
@@ -38,7 +37,6 @@ export const config: TypeOrmModuleOptions = {
     Traza,
     User,
     Role,
-    UserRole,
     Section,
     Country,
     Province,
