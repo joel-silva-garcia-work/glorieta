@@ -18,8 +18,9 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { ReturnDto } from 'src/common/base/dto';
+import { DeleteDto } from 'src/common/base/dto/delete.dto';
 
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
@@ -39,7 +40,9 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @Post('/adduser')
-  async addUser(@GetUserAdmin() user: User, @Body() dto: CreateUserDto):Promise<ReturnDto> {
+  async addUser(
+    // @GetUserAdmin() user: User, 
+  @Body() dto: CreateUserDto):Promise<ReturnDto> {
     return this.userService.createUser(dto);
   }
 
@@ -61,11 +64,11 @@ export class UserController {
   //     return this.userService.editUser(userId,dto);
   // }
   @HttpCode(HttpStatus.OK)
-  @Delete('delete/:userId')
+  @Delete('delete')
   async deleteUser(
     @GetUserAdmin() user: User,
-    @Param('userId') userId: string,
+    dto: DeleteDto
   ) {
-    return this.userService.deleteUser(userId);
+    return this.userService.deleteUser(dto);
   }
 }

@@ -3,22 +3,16 @@ import { IsUUID, IsNumber, IsDecimal, IsString, IsOptional, IsNotEmpty } from 'c
 import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 export class CreateRejectOrderDto {
-  
-  @IsUUID()
-  @IsString()
-  @IsOptional()
-  id?: string;
-
-  @IsUUID()
-  orderProductDeliveryId: string;
-
+  @IsNotEmpty()
   @IsNumber()
   rejectProductAmount: number;
 
-  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
+  @IsNotEmpty()
+  @IsNumber()
   rejectProductPrice: number;
 
-  @ApiProperty()
   @IsNotEmpty()
-  rules: RulesDto
+  @IsUUID()
+  orderProductDeliveryId: string;
+
 }

@@ -5,6 +5,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BaseServiceCRUD } from 'src/common/base/class/base.service.crud.class';
 import { Repository } from 'typeorm';
 import { RejectOrder } from './entities/reject-order.entity';
+import { ReturnDto } from 'src/common/base/dto';
+import { Order } from 'src/order/entities/order.entity';
+import { OrderProductDelivery } from 'src/order-product-delivery/entities/order-product-delivery.entity';
+import { CodeEnum } from 'src/common/enum/code.enum';
 @Injectable()
 export class RejectOrderService extends BaseServiceCRUD<
   RejectOrder,
@@ -14,7 +18,42 @@ export class RejectOrderService extends BaseServiceCRUD<
   constructor(
     @InjectRepository(RejectOrder)
     private readonly repository: Repository<RejectOrder>,
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+    @InjectRepository(OrderProductDelivery)
+    private readonly orderProductDeliveryRepository: Repository<OrderProductDelivery>
   ) {
     super(repository);
+  }
+
+  override async create(createRejectOrderDto: CreateRejectOrderDto): Promise<ReturnDto> {
+    const returnDto: ReturnDto = new ReturnDto()
+    const { orderProductDeliveryId, rejectProductAmount, rejectProductPrice } = createRejectOrderDto;
+
+    // Save reject order
+    const rejectOrder = this.repository.create(createRejectOrderDto);
+    await this.repository.save(rejectOrder);
+
+    // Find the associated order product delivery
+    const orderProductDelivery = await this.orderProductDeliveryRepository.findOne({ where: { id: orderProductDeliveryId } });
+       // Update the order
+
+    const order = await this.orderRepository.findOne({ where: { id: orderProductDelivery.order.id } });
+    if (!orderProductDelivery) {
+      returnDto.isSuccess = false
+      returnDto.returnCode = CodeEnum.BAD_REQUEST
+      returnDto.errorMessage = ('OrderProductDelivery not found');
+    }
+    if (!order && returnDto.isSuccess) {
+      returnDto.isSuccess = false
+      returnDto.returnCode = CodeEnum.BAD_REQUEST
+      returnDto.errorMessage = ('Order not found');
+    }
+    if (returnDto.isSuccess){
+      order.totalProductsPrices -= rejectProductPrice;
+      order.totalPrice -= rejectProductPrice;
+      returnDto.data = await this.orderRepository.save(order);
+    }
+    return returnDto;
   }
 }
