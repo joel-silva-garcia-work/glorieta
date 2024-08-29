@@ -16,26 +16,6 @@
 */
 
 
--- ----------------------------
--- Type structure for marine-contract_management_enum
--- ----------------------------
-DROP TYPE IF EXISTS "public"."marine-contract_management_enum";
-CREATE TYPE "public"."marine-contract_management_enum" AS ENUM (
-  'platform',
-  'hoteltec'
-);
-ALTER TYPE "public"."marine-contract_management_enum" OWNER TO "postgres";
-
--- ----------------------------
--- Type structure for supplement-marine-calendar_type_enum
--- ----------------------------
-DROP TYPE IF EXISTS "public"."supplement-marine-calendar_type_enum";
-CREATE TYPE "public"."supplement-marine-calendar_type_enum" AS ENUM (
-  'pax',
-  'group',
-  'fixed'
-);
-ALTER TYPE "public"."supplement-marine-calendar_type_enum" OWNER TO "postgres";
 
 -- ----------------------------
 -- Table structure for client_info
