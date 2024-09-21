@@ -36,8 +36,16 @@ export class RejectOrderService extends BaseServiceCRUD<
 
     // Find the associated order product delivery
     const orderProductDelivery = await this.orderProductDeliveryRepository.findOne({ where: { id: orderProductDeliveryId } });
-       // Update the order
-
+     
+    if(orderProductDelivery){
+      if(orderProductDelivery.amountProduct < rejectProductAmount){
+        returnDto.isSuccess = false
+        returnDto.returnCode = CodeEnum.BAD_REQUEST
+        returnDto.errorMessage = "Cantidad erronea"
+      }
+      
+    }
+    // Update the order
     const order = await this.orderRepository.findOne({ where: { id: orderProductDelivery.order.id } });
     if (!orderProductDelivery) {
       returnDto.isSuccess = false
@@ -50,9 +58,22 @@ export class RejectOrderService extends BaseServiceCRUD<
       returnDto.errorMessage = ('Order not found');
     }
     if (returnDto.isSuccess){
+      orderProductDelivery.amountProduct -= rejectProductAmount
       order.totalProductsPrices -= rejectProductPrice;
       order.totalPrice -= rejectProductPrice;
-      returnDto.data = await this.orderRepository.save(order);
+      await this.orderRepository.save(order);
+
+      // el rejectProduct Price hay que buscarlo no se recibe del DTO
+      rejectOrder.orderProductDelivery = orderProductDelivery
+      rejectOrder.rejectProductAmount = rejectProductAmount
+      rejectOrder.rejectProductPrice = rejectProductPrice
+
+      returnDto.data = await this.repository.save(rejectOrder)
+      await this.orderProductDeliveryRepository.save(orderProductDelivery)
+      await this.orderRepository.save(order);
+      // falta preguntar si se rechazó toda la orden
+      if(orderProductDelivery.amountProduct == 0)
+      {}
     }
     return returnDto;
   }

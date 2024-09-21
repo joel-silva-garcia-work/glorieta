@@ -16,24 +16,6 @@ import { Type } from 'class-transformer';
 import { RulesDto } from 'src/common/base/dto/rules.dto';
 import { LocateProductDto } from './locate-product.dto';
 
-class ShopSectionProductDetailDto {
-  @ApiProperty()
-  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
-  @Min(1)
-  price: number;
-
-  @ApiProperty()
-  @IsInt()
-  @Min(0)
-  existence: number;
-
-  @ApiProperty({
-    isArray: true,
-  })
-  @ArrayMinSize(1)
-  @ArrayMaxSize(7)
-  caracteristcas: Record<string, any>[];
-}
 
 export class CreateShopSectionProductDto extends LocateProductDto {
   @IsUUID()
@@ -51,17 +33,11 @@ export class CreateShopSectionProductDto extends LocateProductDto {
   @IsString()
   shop: string;
 
-  @ApiProperty({
-    type: [ShopSectionProductDetailDto],
-  })
-  @IsArray()
-  @ArrayMinSize(1)
-  @ValidateNested({ each: true })
-  @Type(() => ShopSectionProductDetailDto)
-  shopSectionDetails: {
-    shopSection: string;
-    details: ShopSectionProductDetailDto;
-  }[];
+  @ApiProperty()
+  @IsInt()
+  @Min(0)
+  existence: number;
+
 
   @ApiProperty()
   @IsNotEmpty()

@@ -19,4 +19,10 @@ export class Product extends BasicInformationEntity {
   @Column({ type: 'text' })
   photo: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2 ,nullable: true})
+  price: number;
+   
+  @Column('json',{nullable:true})
+  caracteristicas: Record<string, any>
+
 }

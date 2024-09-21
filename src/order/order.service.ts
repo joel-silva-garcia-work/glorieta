@@ -135,7 +135,6 @@ export class OrderService extends BaseServiceCRUD<
           }
           else{
             const shopSection = shopSectionProduct.shopSection
-            console.log(shopSection)
           if (shopSection.shop.id !== createOrderDto.shop) {
             returnDto.isSuccess = false
             returnDto.returnCode = CodeEnum.BAD_REQUEST
@@ -165,7 +164,8 @@ export class OrderService extends BaseServiceCRUD<
               where: { id: productDto.shopSectionProductId },
             });
 
-            order.totalProductsPrices += shopSectionProduct.price * productDto.quantity 
+            // quitar comentario y busr el producto
+            // order.totalProductsPrices += productDto.price * productDto.quantity 
             totalProductPrice += order.totalProductsPrices
             savedOrder = await this.repository.save(order)
                       // Update the quantity in ShopSectionProduct

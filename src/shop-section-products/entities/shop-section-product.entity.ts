@@ -11,13 +11,7 @@ export class ShopSectionProducts extends BasicEntity {
   @ManyToOne(() => Product, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT', eager: true })
   product: Product;
 
-  
-  @Column('json',{nullable:true})
-  caracteristicas: Record<string, any>
-
   @Column({ type: 'int' })
   existence: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 ,nullable: true})
-  price: number;
 }

@@ -94,47 +94,46 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
     const results: ShopSectionProducts[] = [];
     const returnDto: ReturnDto = new ReturnDto;
 
-    for (const detail of dto.shopSectionDetails) {
-      const { shopSection, details } = detail;
+    // for (const detail of dto.shopSectionDetails) {
+    //   const { shopSection, details } = detail;
 
-      const product = await this.productRepository.findOne({
-        where:
-        {
-          id: dto.product
-        }
-      });
-      const shopSectionEntity = await this.shopSectionRepository.findOne({
-        where:{
-          id: shopSection
-        }
-      });
+    //   const product = await this.productRepository.findOne({
+    //     where:
+    //     {
+    //       id: dto.product
+    //     }
+    //   });
+    //   const shopSectionEntity = await this.shopSectionRepository.findOne({
+    //     where:{
+    //       id: shopSection
+    //     }
+    //   });
 
-      if(shopSectionEntity.shop != dto.shop as any){
-        returnDto.isSuccess = false
-        returnDto.returnCode = CodeEnum.BAD_REQUEST
-        returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_EQUALS
-      }
+    //   if(shopSectionEntity.shop != dto.shop as any){
+    //     returnDto.isSuccess = false
+    //     returnDto.returnCode = CodeEnum.BAD_REQUEST
+    //     returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_EQUALS
+    //   }
 
-      else if (!product || !shopSectionEntity) {
-        returnDto.isSuccess = false
-        returnDto.returnCode = CodeEnum.BAD_REQUEST
-        returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_FOUND
-      }
-      else {
-      const shopSectionProduct = new ShopSectionProducts();
-      shopSectionProduct.product = product;
-      shopSectionProduct.shopSection = shopSectionEntity;
-      shopSectionProduct.price = details.price;
-      shopSectionProduct.existence = details.existence;
-      shopSectionProduct.caracteristicas = details.caracteristcas;
-      // shopSectionProduct.rules = dto.rules; // Assuming RulesDto can be directly assigned
+    //   else if (!product || !shopSectionEntity) {
+    //     returnDto.isSuccess = false
+    //     returnDto.returnCode = CodeEnum.BAD_REQUEST
+    //     returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_FOUND
+    //   }
+    //   else {
+    //   const shopSectionProduct = new ShopSectionProducts();
+    //   shopSectionProduct.product = product;
+    //   shopSectionProduct.shopSection = shopSectionEntity;
+    //   // shopSectionProduct.price = details.price;
+    //   shopSectionProduct.existence = details.existence;
+    //   // shopSectionProduct.caracteristicas = details.caracteristcas;
 
-      const savedProduct = await this.repository.save(shopSectionProduct);
-      results.push(savedProduct); 
+    //   const savedProduct = await this.repository.save(shopSectionProduct);
+    //   results.push(savedProduct); 
        
-      }
-      returnDto.data = results
-    }
+    //   }
+    //   returnDto.data = results
+    // }
 
     return returnDto;
   }
