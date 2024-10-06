@@ -13,6 +13,7 @@ import { ResourceEnum } from 'src/common/enum/resource.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { Section } from 'src/sections/entities/section.entity';
 import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
+import { Deliveries } from 'src/delivery/entities/delivery.entity';
 @Injectable()
 export class ShopService extends BaseServiceCRUD<
   Shop,
@@ -28,7 +29,9 @@ export class ShopService extends BaseServiceCRUD<
     @InjectRepository(Section)
     private readonly sectionRepository: Repository<Section>,
     @InjectRepository(ShopSections)
-    private readonly shopSectionRepository: Repository<ShopSections>
+    private readonly shopSectionRepository: Repository<ShopSections>,
+    @InjectRepository(Deliveries)
+    private readonly deliveriesRepository: Repository<Deliveries>
   ) {
     super(repository);
   }
@@ -100,5 +103,35 @@ export class ShopService extends BaseServiceCRUD<
     } catch {
       await fs.mkdir(directory, { recursive: true });
     }
+  }
+
+  async getShopDataWithDeliveries(shopID: string): Promise<ReturnDto> {
+    const returnDto = new ReturnDto();
+    try {
+      const shop = await this.repository.findOne({ where: { id: shopID }, relations: ['municipio'] });
+      if (!shop) {
+        returnDto.isSuccess = false;
+        returnDto.returnCode = CodeEnum.NOT_FOUND;
+        returnDto.errorMessage = 'Shop not found';
+        return returnDto;
+      }
+
+      const deliveries = await this.deliveriesRepository.find({
+        where: { 
+          municipalityDestiny: shop.municipality
+        }
+       });
+
+      returnDto.data = {
+        shop,
+        deliveries,
+      };
+      returnDto.isSuccess = true;
+    } catch (error) {
+      returnDto.isSuccess = false;
+      returnDto.errorMessage = error.message;
+      returnDto.returnCode = error.code;
+    }
+    return returnDto;
   }
 }

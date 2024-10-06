@@ -11,6 +11,7 @@ import { CodeEnum } from 'src/common/enum/code.enum';
 import { Product } from 'src/product/entities/product.entity';
 import { ResourceEnum } from 'src/common/enum/resource.enum';
 import { ProductLocations } from './dto/product-locations.dto';
+import { SearchProductDto } from './dto/search-product.dto';
 @Injectable()
 export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProducts,CreateShopSectionProductDto,UpdateShopSectionProductDto> {
   constructor(
@@ -62,6 +63,36 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
     return returnDto;
   }
 
+  async searchProduct(searchProductDto: SearchProductDto): Promise<ReturnDto> {
+    const returnDto = new ReturnDto();
+    const queryBuilder = this.repository.createQueryBuilder('shopSectionProduct')
+      .leftJoinAndSelect('shopSectionProduct.product', 'product')
+      .leftJoinAndSelect('shopSectionProduct.shopSection', 'shopSection')
+      .leftJoinAndSelect('shopSection.shop', 'shop')
+      .where('product.name LIKE :searchString OR product.description LIKE :searchString', { searchString: `%${searchProductDto.searchString}%` });
+
+    if (searchProductDto.minPrice !== undefined && searchProductDto.maxPrice !== undefined) {
+      queryBuilder.andWhere('shopSectionProduct.price BETWEEN :minPrice AND :maxPrice', { minPrice: searchProductDto.minPrice, maxPrice: searchProductDto.maxPrice });
+    } else if (searchProductDto.minPrice !== undefined) {
+      queryBuilder.andWhere('shopSectionProduct.price >= :minPrice', { minPrice: searchProductDto.minPrice });
+    } else if (searchProductDto.maxPrice !== undefined) {
+      queryBuilder.andWhere('shopSectionProduct.price <= :maxPrice', { maxPrice: searchProductDto.maxPrice });
+    }
+
+    if (searchProductDto.sectionId) {
+      queryBuilder.andWhere('shopSectionProduct.shopSectionId = :sectionId', { sectionId: searchProductDto.sectionId });
+    }
+
+    if (searchProductDto.shopId) {
+      queryBuilder.andWhere('shopSection.shopId = :shopId', { shopId: searchProductDto.shopId });
+    }
+
+    const results = await queryBuilder.getMany();
+    returnDto.data = results;
+    return returnDto;
+  }
+
+  
   async findShopsByProductId(productLocations: ProductLocations): Promise<ReturnDto> {
     // Fetch shop section products for the given product
     const returnDto = new ReturnDto

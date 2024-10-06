@@ -21,6 +21,8 @@ export class ClientInfoService extends BaseServiceCRUD<
     super(repository);
   }
 
+  
+
   async findItems(searchDto: ClientInfoSearchDto): Promise<ReturnDto> {
     const returnDto = new ReturnDto();
     const queryBuilder = this.repository

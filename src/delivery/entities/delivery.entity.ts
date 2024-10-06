@@ -12,10 +12,10 @@ import {
 @Entity('deliveries')
 @Unique(['municipalityOrigin', 'municipalityDestiny'])
 export class Deliveries extends BasicEntity {
-  @ManyToOne(() => Municipality, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+  @ManyToOne(() => Municipality, {eager: true})
   municipalityOrigin: Municipality;
 
-  @ManyToOne(() => Municipality, { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
+  @ManyToOne(() => Municipality, {eager: true})
   municipalityDestiny: Municipality;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })

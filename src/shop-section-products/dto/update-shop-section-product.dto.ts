@@ -12,24 +12,9 @@ export class UpdateShopSectionProductDto
 
   @ApiProperty()
   @IsOptional()
-  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
-  @Min(0)
-  price?: number;
-
-  @ApiProperty()
-  @IsOptional()
   @IsInt()
   @Min(0)
   existence?: number;
 
-  @ApiProperty({
-    isArray: true,
-    description: 'List of characteristics to be updated'
-  })
-  @IsOptional()
-  @IsArray()
-   @IsObject({ each: true })
-  characteristics?: Record<string, any>[];
-
-  
+ 
         }

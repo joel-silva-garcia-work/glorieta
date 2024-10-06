@@ -38,9 +38,9 @@ export class ClientInfoCreateDTO {
   @IsNotEmpty()
   municipalityId: string;
 
-  @ApiPropertyOptional()
-  @IsBoolean()
-  @IsOptional()
+  // @ApiPropertyOptional()
+  // @IsBoolean()
+  // @IsOptional()
   actual?: boolean = true; // Optional, default is true
   
   @ApiProperty({
