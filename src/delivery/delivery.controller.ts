@@ -13,7 +13,7 @@ export class DeliveryController extends BaseControllerCRUD<CreateDeliveryDto,Upd
   constructor(private readonly Service: DeliveryService) {
     super(Service)
   }  
-  @Get()
+  @Get('search')
   async findItems(@Query() searchDto: DeliveriesSearchDto): Promise<Deliveries[]> {
     return this.Service.findItems(searchDto);
   }

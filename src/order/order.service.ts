@@ -68,7 +68,6 @@ export class OrderService extends BaseServiceCRUD<
     const order = new Order();
 
     order.totalPrice = 0;
-    order.deliveryTotalPrice = 0
     order.totalProductsPrices = 0
     order.delivery = null
     order.noOrden = await this.generateOrderNumber()
@@ -115,7 +114,6 @@ export class OrderService extends BaseServiceCRUD<
         });
          if (delivery) {
           order.totalPrice += delivery.price;
-          order.deliveryTotalPrice += delivery.price
           order.delivery = delivery  
         }
       }  
@@ -175,10 +173,10 @@ export class OrderService extends BaseServiceCRUD<
           const orderProductDelivery = new OrderProductDelivery();
           orderProductDelivery.amountProduct = productDto.quantity;
           orderProductDelivery.order = savedOrder;
-          orderProductDelivery.fechaEntrega = createOrderDto.fechaEntrega;
+          order.fechaEntrega = createOrderDto.fechaEntrega;
           orderProductDelivery.shopSectionProduct = shopSectionProduct;
           // Estado Reservado
-          orderProductDelivery.deliveryState = "ce6b4846-6e09-4c4b-8d0f-5ac96d7e7256" as any
+          order.deliveryState = "ce6b4846-6e09-4c4b-8d0f-5ac96d7e7256" as any
           await this.orderProductDeliveryRepository.save(orderProductDelivery);
         })
        }

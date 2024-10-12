@@ -22,15 +22,4 @@ export class CreateOrderProductDeliveryDto {
   @IsNumber()
   amountProduct: number;
 
-  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
-  productOrderPrice: number;
-
-  @IsString()
-  fechaEntrega: string;
-
-  @IsUUID()
-  deliveryStateId: string;
-
-  @IsBoolean()
-  toDelivery: boolean;
 }

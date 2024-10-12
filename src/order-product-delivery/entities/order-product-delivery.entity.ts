@@ -19,18 +19,4 @@ export class OrderProductDelivery extends BasicEntity {
   @Column({ type: 'int', nullable: true })
   amountProduct: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  productOrderPrice: number;
-
-  @Column({ type: 'varchar', length: 10 })
-  fechaEntrega: string;
-
-  @ManyToOne(() => DeliveryState, {
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  deliveryState: DeliveryState;
-
-  @Column({ type: 'boolean', default: true })
-  toDelivery: boolean;
 }

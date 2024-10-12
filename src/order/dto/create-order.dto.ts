@@ -47,5 +47,31 @@ export class CreateOrderDto {
   @Type(() => ProductDto)
   products: ProductDto[];
 
+  noOrden: string;
+  totalProductsPrices: number;
+  totalPrice: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  fechaOrder?: string;
+
+  @ApiProperty()
+  @IsUUID()
+  @IsString()
+  @IsOptional()
+  deliveryState?: string;
+
+  @ApiProperty()
+  @IsUUID()
+  @IsString()
+  @IsOptional()
+  orderState?: string;
+
+  @ApiProperty()
+  @IsUUID()
+  @IsString()
+  @IsOptional()
+  delivery?: string;
 
 }
