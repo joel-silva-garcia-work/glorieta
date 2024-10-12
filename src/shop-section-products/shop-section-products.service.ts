@@ -12,6 +12,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { ResourceEnum } from 'src/common/enum/resource.enum';
 import { ProductLocations } from './dto/product-locations.dto';
 import { SearchProductDto } from './dto/search-product.dto';
+import { LocateProductDto } from './dto/locate-product.dto';
 @Injectable()
 export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProducts,CreateShopSectionProductDto,UpdateShopSectionProductDto> {
   constructor(
@@ -121,53 +122,40 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
     return returnDto
   }
 
-  override async create(dto: CreateShopSectionProductDto): Promise<ReturnDto> {
-    const results: ShopSectionProducts[] = [];
-    const returnDto: ReturnDto = new ReturnDto;
+  async locateProduct(locateProductDto: LocateProductDto): Promise<ReturnDto>{
+    const returnDto = new ReturnDto
+    let shopSectionProducts = []
+    const shopSectionIds = locateProductDto.ubicaciones.map(async (ubicacion) => {
+      const shopSection = await this.getShopSectionByShopAndSection(ubicacion.shop, ubicacion.section)
+    const productExists = await this.productRepository.findOne({
+      where: {
+        id: ubicacion.product,
+      }
+    });
 
-    // for (const detail of dto.shopSectionDetails) {
-    //   const { shopSection, details } = detail;
-
-    //   const product = await this.productRepository.findOne({
-    //     where:
-    //     {
-    //       id: dto.product
-    //     }
-    //   });
-    //   const shopSectionEntity = await this.shopSectionRepository.findOne({
-    //     where:{
-    //       id: shopSection
-    //     }
-    //   });
-
-    //   if(shopSectionEntity.shop != dto.shop as any){
-    //     returnDto.isSuccess = false
-    //     returnDto.returnCode = CodeEnum.BAD_REQUEST
-    //     returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_EQUALS
-    //   }
-
-    //   else if (!product || !shopSectionEntity) {
-    //     returnDto.isSuccess = false
-    //     returnDto.returnCode = CodeEnum.BAD_REQUEST
-    //     returnDto.errorMessage = ResourceEnum.ELEMENT_NOT_FOUND
-    //   }
-    //   else {
-    //   const shopSectionProduct = new ShopSectionProducts();
-    //   shopSectionProduct.product = product;
-    //   shopSectionProduct.shopSection = shopSectionEntity;
-    //   // shopSectionProduct.price = details.price;
-    //   shopSectionProduct.existence = details.existence;
-    //   // shopSectionProduct.caracteristicas = details.caracteristcas;
-
-    //   const savedProduct = await this.repository.save(shopSectionProduct);
-    //   results.push(savedProduct); 
-       
-    //   }
-    //   returnDto.data = results
-    // }
-
-    return returnDto;
+    if (productExists && shopSection) {
+      const shopSectionProduct = await this.repository.save({
+        product: productExists,
+        shopSection: shopSection,
+        existence: ubicacion.existence
+      })
+      shopSectionProducts.push(shopSectionProduct)
+    }
+    returnDto.data = shopSectionProducts
+    })
+  return returnDto
   }
   
+  async getShopSectionByShopAndSection(shopId: string, sectionId: string): Promise<ShopSections> {
+
+    const shopSection = await this.shopSectionRepository.findOne({
+      where: {
+        shop: { id: shopId },
+        section: { id: sectionId }
+      }
+    });
+    console.log(shopSection)
+    return shopSection;
+  } 
   
 }

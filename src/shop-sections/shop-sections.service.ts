@@ -74,4 +74,5 @@ export class ShopSectionsService extends BaseServiceCRUD<ShopSections,CreateShop
     }
     return returnDto;
   }
+
 }

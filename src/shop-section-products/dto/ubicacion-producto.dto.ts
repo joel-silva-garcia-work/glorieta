@@ -15,22 +15,16 @@ export class UbicacionProductDto {
 
   @IsUUID()
   @IsString()
-  shopSection: string;
+  section: string;
 
-  @ApiProperty()
-  @IsDecimal({ decimal_digits: '2', locale: 'en-US' })
-  @Min(1)  // Asegura que el precio sea al menos 1
-  price: number;
+  @IsUUID()
+  @IsString()
+  shop: string;
+
 
   @ApiProperty()
   @IsInt()
   @Min(0)  // Asegura que al menos 0
   existence: number;
-
-  @ApiProperty({
-    isArray: true,
-    // type:JSON
-  })
-  caracteristcas:Record<string, any>[]
 
 }

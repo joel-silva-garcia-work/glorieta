@@ -18,6 +18,8 @@ import { LocateProductDto } from './locate-product.dto';
 
 
 export class CreateShopSectionProductDto extends LocateProductDto {
+
+  @ApiProperty()
   @IsUUID()
   @IsString()
   @IsOptional()
@@ -26,12 +28,12 @@ export class CreateShopSectionProductDto extends LocateProductDto {
   @ApiProperty()
   @IsUUID()
   @IsString()
-  product: string;
+  productId: string;
   
   @ApiProperty()
   @IsUUID()
   @IsString()
-  shop: string;
+  shopSectionId: string;
 
   @ApiProperty()
   @IsInt()

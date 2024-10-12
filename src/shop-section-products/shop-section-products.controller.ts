@@ -14,6 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { BaseControllerCRUD } from 'src/common/base/class/base.controller.crud.class';
 import { ReturnDto } from 'src/common/base/dto';
 import { SearchProductDto } from './dto/search-product.dto';
+import { LocateProductDto } from './dto/locate-product.dto';
 
 @ApiTags('Shop Section Products')
 @Controller('shop-section-products')
@@ -24,6 +25,11 @@ export class ShopSectionProductsController extends BaseControllerCRUD<
 > {
   constructor(private readonly Service: ShopSectionProductsService) {
     super(Service);
+  }
+
+  @Post()
+  override async create(@Body() locateProductDto: LocateProductDto): Promise<ReturnDto>{
+    return this.Service.locateProduct(locateProductDto);
   }
 
   @Patch()  
