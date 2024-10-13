@@ -253,13 +253,56 @@ override async create(createOrderDto: CreateOrderDto): Promise<ReturnDto> {
   else{
     order.toDelivery = false;
   }
-  // quitar
+
+// create Order
+// calculate total price
+order.totalPrice = 0
+  let totalPrice = 0;
+  for (let i = 0; i < shoppingCart.shopSectionProductIds.length; i++) {
+    const shopSectionProductId = shoppingCart.shopSectionProductIds[i];
+    const shopSectionProduct = await this.shopSectionProductRepository.findOne({
+      where: { id: shopSectionProductId }
+    });
+
+    if (shopSectionProduct) {
+      const amountProduct = shoppingCart.quantities[i];
+      const productPrice = shopSectionProduct.product.price;
+      totalPrice += productPrice * amountProduct;
+    }
+  }
+  order.totalPrice += totalPrice;
   order.totalProductsPrices = createOrderDto.totalProductsPrices;
-  order.totalPrice = createOrderDto.totalPrice;
 
-  // create Order
+
+// save order
   const orders = await this.repository.save(order);
+// crear orderProductDelivery
 
+  let i = 0
+  for (const shopSectionProductId of shoppingCart.shopSectionProductIds) {
+    const orderProductDelivery = new OrderProductDelivery();
+    orderProductDelivery.order = order;
+     orderProductDelivery.shopSectionProduct = await this.shopSectionProductRepository.findOne({
+      where: { id: shopSectionProductId }
+    });
+    orderProductDelivery.amountProduct = shoppingCart.quantities[i];
+    i = i+1
+    await this.orderProductDeliveryRepository.save(orderProductDelivery);
+  }
+// restar stock
+  i=0
+  for (const shopSectionProductId of shoppingCart.shopSectionProductIds) {
+    const shopSectionProduct = await this.shopSectionProductRepository.findOne({
+      where: { id: shopSectionProductId }
+    });
+
+    if (shopSectionProduct) {
+      const amountProduct = shoppingCart.quantities[i];
+      shopSectionProduct.existence -= amountProduct;
+      await this.shopSectionProductRepository.save(shopSectionProduct);
+      i=i+1
+    }
+  }
   returnDto.data = orders;
 
   return returnDto;
