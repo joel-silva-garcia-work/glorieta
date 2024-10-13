@@ -253,7 +253,11 @@ override async create(createOrderDto: CreateOrderDto): Promise<ReturnDto> {
   else{
     order.toDelivery = false;
   }
-  // Create the order
+  // quitar
+  order.totalProductsPrices = createOrderDto.totalProductsPrices;
+  order.totalPrice = createOrderDto.totalPrice;
+
+  // create Order
   const orders = await this.repository.save(order);
 
   returnDto.data = orders;
