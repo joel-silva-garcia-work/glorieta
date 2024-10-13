@@ -13,6 +13,14 @@ import { Municipality } from 'src/municipality/entities/municipality.entity';
 import { MunicipalityModule } from 'src/municipality/municipality.module';
 import { Product } from 'src/product/entities/product.entity';
 import { ProductModule } from 'src/product/product.module';
+import { ClientInfo } from 'src/client-info/entities/client-info.entity';
+import { ShoppingCart } from 'src/shopping-cart/entities/shopping-cart.entity';
+import { ShoppingCartModule } from 'src/shopping-cart/shopping-cart.module';
+import { ClientInfoModule } from 'src/client-info/client-info.module';
+import { OrderStateModule } from 'src/order-state/order-state.module';
+import { OrderStates } from 'src/order-state/entities/order-state.entity';
+import { Shop } from 'src/shop/entities/shop.entity';
+import { DeliveryState } from 'src/delivery-state/entities/delivery-state.entity';
 
 @Module({
   imports: [
@@ -22,13 +30,22 @@ import { ProductModule } from 'src/product/product.module';
       ShopSectionProducts, 
       Deliveries,
       Municipality,
-      Product
+      Product,
+      ShoppingCart,
+      ClientInfo,
+      OrderStates,
+      Shop,
+      DeliveryState
     ]),    
     forwardRef(() => OrderProductDeliveryModule),
     forwardRef(() => ShopSectionProductsModule),
     forwardRef(() => MunicipalityModule),
     forwardRef(() => ProductModule),
     forwardRef(() => DeliveryModule),
+    forwardRef(() => ShoppingCartModule),
+    forwardRef(() => ClientInfoModule),
+    forwardRef(() => OrderStateModule),
+    
 
 ],
   controllers: [OrderController],

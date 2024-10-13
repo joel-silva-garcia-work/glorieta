@@ -15,6 +15,11 @@ import { ResourceEnum } from 'src/common/enum/resource.enum';
 import { Municipality } from 'src/municipality/entities/municipality.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { UUID } from 'typeorm/driver/mongodb/bson.typings';
+import { ShoppingCart } from 'src/shopping-cart/entities/shopping-cart.entity';
+import { ClientInfo } from 'src/client-info/entities/client-info.entity';
+import { OrderStates } from 'src/order-state/entities/order-state.entity';
+import { Shop } from 'src/shop/entities/shop.entity';
+import { DeliveryState } from 'src/delivery-state/entities/delivery-state.entity';
 @Injectable()
 export class OrderService extends BaseServiceCRUD<
   Order,
@@ -36,6 +41,17 @@ export class OrderService extends BaseServiceCRUD<
     private readonly deliveryRepository: Repository<Deliveries>,
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(ShoppingCart)
+    private readonly shoppingCartRepository: Repository<ShoppingCart>,
+    @InjectRepository(ClientInfo)
+    private readonly clientInfoRepository: Repository<ClientInfo>,
+    @InjectRepository(OrderStates)
+    private readonly orderStateRepository: Repository<OrderStates>,
+    @InjectRepository(Shop)
+    private readonly shopRepository: Repository<Shop>,
+    @InjectRepository(DeliveryState)
+    private readonly deliveryStateRepository: Repository<DeliveryState>,
+    
   ) {
     super(repository);
   }
@@ -61,140 +77,6 @@ export class OrderService extends BaseServiceCRUD<
 
     return `${this.PREFIX}${yearPrefix}-${formattedNumber}`;
   }
-
-  override async create(createOrderDto: CreateOrderDto): Promise<ReturnDto> {
-    const returnDto = new ReturnDto
-
-    const order = new Order();
-
-    order.totalPrice = 0;
-    order.totalProductsPrices = 0
-    order.delivery = null
-    order.noOrden = await this.generateOrderNumber()
-    order.fechaOrder = new Date().getDate().toString()
-    let savedOrder = await this.repository.save(order)
-    let totalProductPrice = 0
-    // Calculate delivery cost if toDelivery is true
-     if (createOrderDto.toDelivery) {
-      if(!createOrderDto.municipalityOrigin || ! createOrderDto.municipalityDestiny)
-      {
-        returnDto.isSuccess = false
-        returnDto.returnCode = CodeEnum.BAD_REQUEST
-        returnDto.errorMessage = 'At least one municipality is not setted'
-      }
-      else{
-        const municipalityOrigin = await this.municipalityRepository.findOne({
-          where:{
-            id : createOrderDto.municipalityOrigin
-          }
-        })
-      if(!municipalityOrigin)
-      {
-        returnDto.isSuccess = false
-        returnDto.returnCode = CodeEnum.BAD_REQUEST
-        returnDto.errorMessage = 'Origin municipality is wrong.'
-      }
-        const municipalityDestiny = await this.municipalityRepository.findOne({
-          where:{
-            id : createOrderDto.municipalityDestiny
-          }
-        })
-      if(!municipalityDestiny)
-        {
-          returnDto.isSuccess = false
-          returnDto.returnCode = CodeEnum.BAD_REQUEST
-          returnDto.errorMessage = 'Destiny municipality is wrong.'
-        }
-        if(municipalityOrigin && municipalityDestiny){
-        const delivery = await this.deliveryRepository.findOne({
-          where: {
-            municipalityOrigin: municipalityOrigin,
-            municipalityDestiny: municipalityDestiny,
-          },
-        });
-         if (delivery) {
-          order.totalPrice += delivery.price;
-          order.delivery = delivery  
-        }
-      }  
-    }
-    }
-
-      // Verify that all orders are from the same shop
-      createOrderDto.products.forEach  (async (productDto)=> {
-          const shopSectionProduct = await this.shopSectionProductRepository.findOne({
-            where: { id: productDto.shopSectionProductId },
-          });
-
-          if (!shopSectionProduct) {
-            returnDto.isSuccess = false
-            returnDto.returnCode = CodeEnum.BAD_REQUEST
-            returnDto.errorMessage = `ShopSectionProduct with ID ${productDto.shopSectionProductId} not found.`
-          }
-          else{
-            const shopSection = shopSectionProduct.shopSection
-          if (shopSection.shop.id !== createOrderDto.shop) {
-            returnDto.isSuccess = false
-            returnDto.returnCode = CodeEnum.BAD_REQUEST
-            returnDto.errorMessage = `ShopSectionProduct with ID ${productDto.shopSectionProductId} does not belong to shop ${createOrderDto.shop}.`
-          }
-        }
-      })
-
-      // verify Existence
-      createOrderDto.products.forEach  (async (productDto)=> {
-        const shopSectionProduct = await this.shopSectionProductRepository.findOne({
-          where: { id: productDto.shopSectionProductId },
-        });
-
-        if (shopSectionProduct.existence < productDto.quantity) {
-          returnDto.isSuccess = false
-          returnDto.returnCode = CodeEnum.BAD_REQUEST
-          returnDto.errorMessage = `Can not be selled this cuantity of product.`
-        }
-
-    })
-
-       // buscar los Productos
-       if(returnDto.isSuccess){
-        createOrderDto.products.forEach  (async (productDto)=> {
-            const shopSectionProduct = await this.shopSectionProductRepository.findOne({
-              where: { id: productDto.shopSectionProductId },
-            });
-
-            // quitar comentario y busr el producto
-            // order.totalProductsPrices += productDto.price * productDto.quantity 
-            totalProductPrice += order.totalProductsPrices
-            savedOrder = await this.repository.save(order)
-                      // Update the quantity in ShopSectionProduct
-          shopSectionProduct.existence -= productDto.quantity;
-          await this.shopSectionProductRepository.save(shopSectionProduct);
-  
-          const orderProductDelivery = new OrderProductDelivery();
-          orderProductDelivery.amountProduct = productDto.quantity;
-          orderProductDelivery.order = savedOrder;
-          order.fechaEntrega = createOrderDto.fechaEntrega;
-          orderProductDelivery.shopSectionProduct = shopSectionProduct;
-          // Estado Reservado
-          order.deliveryState = "ce6b4846-6e09-4c4b-8d0f-5ac96d7e7256" as any
-          await this.orderProductDeliveryRepository.save(orderProductDelivery);
-        })
-       }
-      
-      // Add product prices to totalPrice
-      savedOrder.totalPrice += totalProductPrice;
-  
-      // Estado Id Solicitada
-      savedOrder.orderState = ("34ef12a0-79bd-4078-80c2-33fae602225c") as any
-      // Save the updated order with totalPrice
-      await this.repository.save(savedOrder);
-  
-     
-    returnDto.data = savedOrder
-    return returnDto;
-
-  }
-
 
   async findItems(searchDto: OrderSearchDto): Promise<Order[]> {
     const queryBuilder = this.repository
@@ -310,4 +192,72 @@ export class OrderService extends BaseServiceCRUD<
     }
     return queryBuilder.getMany();
   }
+
+override async create(createOrderDto: CreateOrderDto): Promise<ReturnDto> {
+  const returnDto = new ReturnDto();
+  const { shoppingCartId, clientInfo, toDelivery } = createOrderDto;
+
+  // Verify if the shopping cart exists
+  const shoppingCart = await this.shoppingCartRepository.findOne({where:{id:shoppingCartId}});
+  if (!shoppingCart) {
+    return {
+      isSuccess: false,
+      returnCode: 404,
+      errorMessage: 'Shopping cart not found',
+    };
+  }
+
+  // Create client info and get its id
+  const newClientInfo = this.clientInfoRepository.create(clientInfo);
+  const savedClientInfo = await this.clientInfoRepository.save(newClientInfo);
+  const orderState = await this.orderStateRepository.findOne({where:{id: "34ef12a0-79bd-4078-80c2-33fae602225c"}});
+  const  order = new Order();
+  order.clientInfo = savedClientInfo;
+  order.noOrden = await this.generateOrderNumber();
+  order.fechaOrder = new Date().toISOString().split('T')[0];
+  order.shoppingCart = shoppingCart;
+  order.toDelivery = toDelivery;
+  order.orderState = orderState;
+  // If toDelivery is true, get the shopID from the first shopSectionProduct in the shopping cart
+  if (toDelivery) {
+    order.toDelivery = true;
+    const firstShopSectionProduct = shoppingCart.shopSectionProductIds[0];
+    if (firstShopSectionProduct) {
+      // busco la tienda
+      const shop = await this.shopRepository.findOne({
+        where:{
+          id:firstShopSectionProduct
+        }
+      });
+      if(shop){
+        // busco si la info del cliente y la tienda hay delivery
+        const deliveryOrigin = shop.municipality
+        const deliveryDestiny = savedClientInfo.municipality
+        const delivery = await this.deliveryRepository.findOne({
+          where:{
+            municipalityOrigin: deliveryOrigin,
+            municipalityDestiny: deliveryDestiny
+          }
+        })
+        if(delivery){
+          order.delivery = delivery;
+          order.deliveryState = await this.deliveryStateRepository.findOne({where:{id: "ce6b4846-6e09-4c4b-8d0f-5ac96d7e7256"}});
+          order.toDelivery = true;
+        }
+        else{
+          order.toDelivery = false;
+        }
+      }
+    }
+  }
+  else{
+    order.toDelivery = false;
+  }
+  // Create the order
+  const orders = await this.repository.save(order);
+
+  returnDto.data = orders;
+
+  return returnDto;
+}
 }

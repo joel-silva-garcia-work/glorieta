@@ -154,7 +154,6 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
         section: { id: sectionId }
       }
     });
-    console.log(shopSection)
     return shopSection;
   } 
   
