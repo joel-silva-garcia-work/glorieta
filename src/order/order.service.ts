@@ -212,6 +212,8 @@ override async create(createOrderDto: CreateOrderDto): Promise<ReturnDto> {
   const savedClientInfo = await this.clientInfoRepository.save(newClientInfo);
   const orderState = await this.orderStateRepository.findOne({where:{id: "34ef12a0-79bd-4078-80c2-33fae602225c"}});
   const  order = new Order();
+  order.totalPrice = 0
+  order.totalProductsPrices = 0
   order.clientInfo = savedClientInfo;
   order.noOrden = await this.generateOrderNumber();
   order.fechaOrder = new Date().toISOString().split('T')[0];
@@ -243,6 +245,7 @@ override async create(createOrderDto: CreateOrderDto): Promise<ReturnDto> {
           order.delivery = delivery;
           order.deliveryState = await this.deliveryStateRepository.findOne({where:{id: "ce6b4846-6e09-4c4b-8d0f-5ac96d7e7256"}});
           order.toDelivery = true;
+          order.totalPrice = delivery.price
         }
         else{
           order.toDelivery = false;
