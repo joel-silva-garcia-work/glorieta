@@ -28,53 +28,36 @@ export class RejectOrderService extends BaseServiceCRUD<
 
   override async create(createRejectOrderDto: CreateRejectOrderDto): Promise<ReturnDto> {
     const returnDto: ReturnDto = new ReturnDto()
-    const { orderProductDeliveryId, rejectProductAmount, rejectProductPrice } = createRejectOrderDto;
+    const { orderProductDeliveryId, rejectProductAmount } = createRejectOrderDto;
+
+    const productDelivery = await this.orderProductDeliveryRepository.findOne({ where: { id: orderProductDeliveryId } });
+    if (!productDelivery) {
+      returnDto.isSuccess = false;
+      returnDto.returnCode = CodeEnum.BAD_REQUEST;
+      returnDto.errorMessage = 'OrderProductDelivery not found';
+      return returnDto;
+    }
+    const product = productDelivery.shopSectionProduct.product;
 
     // Save reject order
-    const rejectOrder = this.repository.create(createRejectOrderDto);
-    await this.repository.save(rejectOrder);
-
-    // Find the associated order product delivery
-    const orderProductDelivery = await this.orderProductDeliveryRepository.findOne({ where: { id: orderProductDeliveryId } });
-     
-    if(orderProductDelivery){
-      if(orderProductDelivery.amountProduct < rejectProductAmount){
-        returnDto.isSuccess = false
-        returnDto.returnCode = CodeEnum.BAD_REQUEST
-        returnDto.errorMessage = "Cantidad erronea"
-      }
-      
+    const rejectedOrder =await this.repository.create({
+      orderProductDelivery: productDelivery,
+      rejectProductAmount: rejectProductAmount,
+      rejectProductPrice:product.price
+    });
+    if (productDelivery.amountProduct < rejectProductAmount) {
+      returnDto.isSuccess = false;
+      returnDto.returnCode = CodeEnum.BAD_REQUEST;
+      returnDto.errorMessage = 'Cannot reject more products than available in the order';
+      return returnDto;
     }
+    await this.repository.save(rejectedOrder);
+  
     // Update the order
-    const order = await this.orderRepository.findOne({ where: { id: orderProductDelivery.order.id } });
-    if (!orderProductDelivery) {
-      returnDto.isSuccess = false
-      returnDto.returnCode = CodeEnum.BAD_REQUEST
-      returnDto.errorMessage = ('OrderProductDelivery not found');
-    }
-    if (!order && returnDto.isSuccess) {
-      returnDto.isSuccess = false
-      returnDto.returnCode = CodeEnum.BAD_REQUEST
-      returnDto.errorMessage = ('Order not found');
-    }
-    if (returnDto.isSuccess){
-      orderProductDelivery.amountProduct -= rejectProductAmount
-      order.totalProductsPrices -= rejectProductPrice;
-      order.totalPrice -= rejectProductPrice;
-      await this.orderRepository.save(order);
-
-      // el rejectProduct Price hay que buscarlo no se recibe del DTO
-      rejectOrder.orderProductDelivery = orderProductDelivery
-      rejectOrder.rejectProductAmount = rejectProductAmount
-      rejectOrder.rejectProductPrice = rejectProductPrice
-
-      returnDto.data = await this.repository.save(rejectOrder)
-      await this.orderProductDeliveryRepository.save(orderProductDelivery)
-      await this.orderRepository.save(order);
-      // falta preguntar si se rechazó toda la orden
-      if(orderProductDelivery.amountProduct == 0)
-      {}
-    }
+    const order = productDelivery.order
+    //  actualizar la orden
+    // preguntar si se rechazó toda la orden
+     
     return returnDto;
   }
 }

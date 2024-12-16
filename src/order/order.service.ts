@@ -20,6 +20,8 @@ import { ClientInfo } from 'src/client-info/entities/client-info.entity';
 import { OrderStates } from 'src/order-state/entities/order-state.entity';
 import { Shop } from 'src/shop/entities/shop.entity';
 import { DeliveryState } from 'src/delivery-state/entities/delivery-state.entity';
+import { MailService } from 'src/mail-service/mail-service.service';
+import { SearchShopDeliveryDto } from './dto/search-shop-delivery.dto';
 @Injectable()
 export class OrderService extends BaseServiceCRUD<
   Order,
@@ -51,7 +53,8 @@ export class OrderService extends BaseServiceCRUD<
     private readonly shopRepository: Repository<Shop>,
     @InjectRepository(DeliveryState)
     private readonly deliveryStateRepository: Repository<DeliveryState>,
-    
+    private readonly mailService: MailService, // Inyección del servicio de correo
+
   ) {
     super(repository);
   }
@@ -199,21 +202,20 @@ override async create(createOrderDto: CreateOrderDto): Promise<ReturnDto> {
 
   // Verify if the shopping cart exists
   const shoppingCart = await this.shoppingCartRepository.findOne({where:{id:shoppingCartId}});
-  if (!shoppingCart) {
-    return {
-      isSuccess: false,
-      returnCode: 404,
-      errorMessage: 'Shopping cart not found',
-    };
+  if (!shoppingCart) 
+    {
+    returnDto.errorMessage = ResourceEnum.ENTITY_NOT_FOUND
+    returnDto.returnCode = CodeEnum.BAD_REQUEST
+    returnDto.isSuccess = false
+    return returnDto
   }
 
   // Create client info and get its id
   const newClientInfo = this.clientInfoRepository.create(clientInfo);
   const savedClientInfo = await this.clientInfoRepository.save(newClientInfo);
+
   const orderState = await this.orderStateRepository.findOne({where:{id: "34ef12a0-79bd-4078-80c2-33fae602225c"}});
   const  order = new Order();
-  order.totalPrice = 0
-  order.totalProductsPrices = 0
   order.clientInfo = savedClientInfo;
   order.noOrden = await this.generateOrderNumber();
   order.fechaOrder = new Date().toISOString().split('T')[0];
@@ -245,8 +247,7 @@ override async create(createOrderDto: CreateOrderDto): Promise<ReturnDto> {
           order.delivery = delivery;
           order.deliveryState = await this.deliveryStateRepository.findOne({where:{id: "ce6b4846-6e09-4c4b-8d0f-5ac96d7e7256"}});
           order.toDelivery = true;
-          order.totalPrice = delivery.price
-        }
+         }
         else{
           order.toDelivery = false;
         }
@@ -256,26 +257,6 @@ override async create(createOrderDto: CreateOrderDto): Promise<ReturnDto> {
   else{
     order.toDelivery = false;
   }
-
-// create Order
-// calculate total price
-order.totalPrice = 0
-  let totalPrice = 0;
-  for (let i = 0; i < shoppingCart.shopSectionProductIds.length; i++) {
-    const shopSectionProductId = shoppingCart.shopSectionProductIds[i];
-    const shopSectionProduct = await this.shopSectionProductRepository.findOne({
-      where: { id: shopSectionProductId }
-    });
-
-    if (shopSectionProduct) {
-      const amountProduct = shoppingCart.quantities[i];
-      const productPrice = shopSectionProduct.product.price;
-      totalPrice += productPrice * amountProduct;
-    }
-  }
-  order.totalPrice += totalPrice;
-  order.totalProductsPrices = createOrderDto.totalProductsPrices;
-
 
 // save order
   const orders = await this.repository.save(order);
@@ -308,6 +289,131 @@ order.totalPrice = 0
   }
   returnDto.data = orders;
 
+  // Aca envio el correo
+  await this.sendOrderEmail(orders.id);
   return returnDto;
 }
+async sendOrderEmail(orderId: string): Promise<void> {
+  const queryBuilder = this.repository.createQueryBuilder('order')
+    .leftJoinAndSelect('order.clientInfo', 'clientInfo')
+    .leftJoinAndSelect('order.orderProductDeliveries', 'orderProductDeliveries')
+    .leftJoinAndSelect('orderProductDeliveries.shopSectionProduct', 'shopSectionProduct')
+    .leftJoinAndSelect('shopSectionProduct.product', 'product')
+    .leftJoinAndSelect('order.delivery', 'delivery')
+    .where('order.id = :orderId', { orderId });
+
+  const orderDetails = await queryBuilder.getOne();
+
+  const orderDetailsJson = {
+    orderId: orderDetails.id,
+    clientInfo: {
+      name: orderDetails.clientInfo.name,
+      email: orderDetails.clientInfo.email,
+    },
+    orderProductDeliveries: orderDetails.orderProductDeliveries.map(delivery => ({
+      productName: delivery.shopSectionProduct.product.name,
+      productDescription: delivery.shopSectionProduct.product.description,
+      amountProduct: delivery.amountProduct,
+      productPrice: delivery.shopSectionProduct.product.price,
+    })),
+    delivery: orderDetails.delivery ? {
+      deliveryId: orderDetails.delivery.id,
+      deliveryPrice: orderDetails.delivery.price,
+    } : null,
+    toDelivery: orderDetails.toDelivery,
+  };
+
+
+
+  let emailTemplate = `
+    <h1>Order Details</h1>
+    <p>Order ID: ${orderDetailsJson.orderId}</p>
+    <p>Client Name: ${orderDetails.clientInfo.name}</p>
+    <p>Client Email: ${orderDetails.clientInfo.email}</p>
+    <h2>Products</h2>
+    <ul>
+      ${orderDetails.orderProductDeliveries.map(delivery => `
+        <li>
+          <p>Product Name: ${delivery.shopSectionProduct.product.name}</p>
+          <p>Product Description: ${delivery.shopSectionProduct.product.description}</p>
+          <p>Amount: ${delivery.amountProduct}</p>
+          <p>Price: ${delivery.shopSectionProduct.product.price}</p>
+        </li>
+      `).join('')}
+    </ul>
+    ${orderDetails.toDelivery ? `
+      <h2>Delivery Details</h2>
+      <p>Delivery ID: ${orderDetails.delivery.id}</p>
+      <p>Delivery Price: ${orderDetails.delivery.price}</p>
+    ` : ''}
+  `;
+  const order = await this.repository.findOne({
+    where: { id: orderId },
+    relations: ['orderProductDeliveries', 'orderProductDeliveries.shopSectionProduct', 'orderProductDeliveries.shopSectionProduct.product']
+  });
+
+  if (!order) {
+    throw new Error('Order not found');
+  }
+ emailTemplate = ``
+  // const emailTemplate = `
+  //   <h1>Order Details</h1>
+  //   <p>Order ID: ${order.id}</p>
+  //   <p>Total Price: ${order.totalPrice}</p>
+  //   <p>Total Products Prices: ${order.totalProductsPrices}</p>
+  //   <h2>Products</h2>
+  //   <ul>
+  //     ${order.delivery.map(delivery => `
+  //       <li>
+  //         <p>Product Name: ${delivery.shopSectionProduct.product.name}</p>
+  //         <p>Product Description: ${delivery.shopSectionProduct.product.description}</p>
+  //         <p>Amount: ${delivery.amountProduct}</p>
+  //         <p>Price: ${delivery.shopSectionProduct.product.price}</p>
+  //       </li>
+  //     `).join('')}
+  //   </ul>
+  // `;
+
+  // Assuming you have a mail service to send emails
+  await this.mailService.sendEmail(order.clientInfo.email, 'Your Order Details', emailTemplate);
 }
+
+  async getDelivery(dto: SearchShopDeliveryDto): Promise<ReturnDto> {
+    const returnDto = new ReturnDto();
+   
+    const shoppingCart = await this.shoppingCartRepository.findOne({where:{id:dto.shoppingCartId}});
+    if (!shoppingCart) 
+  
+
+      if (shoppingCart) {
+        // busco la tienda
+        const firstShopSectionProduct = shoppingCart.shopSectionProductIds[0];
+
+        const shop = await this.shopRepository.findOne({
+          where:{
+            id:firstShopSectionProduct
+          }
+        });
+        if(shop){
+          // busco si la info del cliente y la tienda hay delivery
+          const deliveryOrigin = shop.municipality
+          const deliveryDestiny = await this.municipalityRepository.findOne({where:{id:dto.municipalityId}});
+          const delivery = await this.deliveryRepository.findOne({
+            where:{
+              municipalityOrigin: deliveryOrigin,
+              municipalityDestiny: deliveryDestiny
+            }
+          });
+          if(delivery){
+           returnDto.data = delivery
+           }
+          else{
+            returnDto.isSuccess = false;
+            returnDto.data = []
+          }
+        }
+      return returnDto;
+    }  
+  }
+}
+

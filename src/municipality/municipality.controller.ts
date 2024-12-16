@@ -23,8 +23,10 @@ export class MunicipalityController extends BaseControllerCRUD<CreateMunicipalit
     super(Service)
   } 
   
-  @Get('all')
-  async findAll(@Query() searchDto: MunicipalitySearchDto): Promise<Municipality[]> {
-    return this.Service.findItems(searchDto);
+  @Post('all')
+  async findAll(@Body() searchDto: MunicipalitySearchDto): Promise<Municipality[]> {
+    return await this.Service.findItems(searchDto);
   }
+
+
 }

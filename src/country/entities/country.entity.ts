@@ -10,8 +10,8 @@ export class Country extends ExtendedEntity {
   @Column({ nullable: true })
   numericCode: number;
 
-  @OneToMany(() => Province, (province) => province.country, {
-    cascade: false,
-  })
-  provinces: Province[];
+  // @OneToMany(() => Province, (province) => province.country, {
+  //   cascade: false,
+  // })
+  // provinces: Province[];
 }

@@ -6,6 +6,5 @@ export abstract class ExtendedEntity
 {
   @Column({ default: true })
   isActive: boolean;
-  // @Column({ default: false })
-  // isUsed: boolean;
+
 }

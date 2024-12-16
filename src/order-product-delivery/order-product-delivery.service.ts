@@ -21,10 +21,15 @@ export class OrderProductDeliveryService extends BaseServiceCRUD<OrderProductDel
     const deliveryStateId = '77fd331c-70d2-47a6-bc17-65cd167e9d13';
 
     const queryBuilder = this.repository.createQueryBuilder('orderProductDelivery')
-      .select('orderProductDelivery.shopSectionProductId', 'productId')
+      .leftJoinAndSelect('orderProductDelivery.product', 'product')
+      .select('product.id', 'productId')
+      .addSelect('product.name', 'productName')
+      .addSelect('product.description', 'productDescription')
+      .addSelect('product.price', 'productPrice')
+      .addSelect('product.photo', 'productPhoto')
       .addSelect('SUM(orderProductDelivery.amountProduct)', 'totalSold')
       .where('orderProductDelivery.deliveryStateId = :deliveryStateId', { deliveryStateId })
-      .groupBy('orderProductDelivery.shopSectionProductId')
+      .groupBy('product.id')
       .orderBy('totalSold', 'DESC')
       .limit(10);
 

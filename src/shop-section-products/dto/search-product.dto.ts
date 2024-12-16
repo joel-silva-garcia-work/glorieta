@@ -3,8 +3,14 @@ import { IsOptional, IsString, IsUUID, IsDecimal, Min } from 'class-validator';
 
 export class SearchProductDto {
   @ApiProperty()
+  @IsOptional()
+  @IsUUID()
+  id?: string;
+
+  @ApiProperty()
+  @IsOptional()
   @IsString()
-  searchString: string;
+  name?: string;
 
   @ApiProperty()
   @IsOptional()

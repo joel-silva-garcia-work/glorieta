@@ -6,6 +6,7 @@ import { BaseServiceCRUD } from 'src/common/base/class/base.service.crud.class';
 import { Repository } from 'typeorm';
 import { Municipality } from './entities/municipality.entity';
 import { MunicipalitySearchDto } from './dto/municipality-search.dto';
+import { ReturnDto } from 'src/common/base/dto';
 @Injectable()
 export class MunicipalityService extends BaseServiceCRUD<Municipality,CreateMunicipalityDto,UpdateMunicipalityDto> {
   constructor(
@@ -23,11 +24,14 @@ export class MunicipalityService extends BaseServiceCRUD<Municipality,CreateMuni
       queryBuilder.andWhere('municipality.name LIKE :name', { name: `%${searchDto.name}%` });
     }
     if (searchDto.provinceId) {
-      queryBuilder.andWhere('municipality.provinceId = :provinceId', { provinceId: searchDto.provinceId });
+      queryBuilder.andWhere('municipality.province = :provinceId', { provinceId: searchDto.provinceId });
     }
     if (searchDto.provinceName) {
       queryBuilder.andWhere('province.name LIKE :provinceName', { provinceName: `%${searchDto.provinceName}%` });
     }
-    return queryBuilder.getMany();
+    const returnDto = new ReturnDto;
+    returnDto.data = await queryBuilder.getMany();
+
+    return await queryBuilder.getMany();
   }
 }

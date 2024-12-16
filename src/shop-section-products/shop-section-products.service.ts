@@ -13,6 +13,7 @@ import { ResourceEnum } from 'src/common/enum/resource.enum';
 import { ProductLocations } from './dto/product-locations.dto';
 import { SearchProductDto } from './dto/search-product.dto';
 import { LocateProductDto } from './dto/locate-product.dto';
+import { SearchSSPDto } from './dto/search.dto';
 @Injectable()
 export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProducts,CreateShopSectionProductDto,UpdateShopSectionProductDto> {
   constructor(
@@ -26,7 +27,7 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
     super(repository)
   }
 
-  override   async update(updateDto: UpdateShopSectionProductDto): Promise<ReturnDto> {
+  override async update(updateDto: UpdateShopSectionProductDto): Promise<ReturnDto> {
     let valid  =true
     const returnDto = new ReturnDto
     // if (updateDto.rules) {
@@ -70,7 +71,7 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
       .leftJoinAndSelect('shopSectionProduct.product', 'product')
       .leftJoinAndSelect('shopSectionProduct.shopSection', 'shopSection')
       .leftJoinAndSelect('shopSection.shop', 'shop')
-      .where('product.name LIKE :searchString OR product.description LIKE :searchString', { searchString: `%${searchProductDto.searchString}%` });
+      .where('product.name LIKE :searchString OR product.description LIKE :searchString', { searchString: `%${searchProductDto.name}%` });
 
     if (searchProductDto.minPrice !== undefined && searchProductDto.maxPrice !== undefined) {
       queryBuilder.andWhere('shopSectionProduct.price BETWEEN :minPrice AND :maxPrice', { minPrice: searchProductDto.minPrice, maxPrice: searchProductDto.maxPrice });
@@ -133,12 +134,14 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
       }
     });
 
-    if (productExists && shopSection) {
+    if (productExists && shopSection)
+       {
       const shopSectionProduct = await this.repository.save({
         product: productExists,
         shopSection: shopSection,
         existence: ubicacion.existence
       })
+      console.log(shopSectionProduct)
       shopSectionProducts.push(shopSectionProduct)
     }
     returnDto.data = shopSectionProducts
@@ -154,7 +157,85 @@ export class ShopSectionProductsService extends BaseServiceCRUD<ShopSectionProdu
         section: { id: sectionId }
       }
     });
+    // console.log(shopSection)
     return shopSection;
   } 
+  async searchProductBy(dto: SearchProductDto): Promise<ReturnDto> {
+    const returnDto = new ReturnDto();
+
+    const queryBuilder = this.repository.createQueryBuilder('shopSectionProducts')
+      .innerJoinAndSelect('shopSectionProducts.product', 'product')
+      .innerJoinAndSelect('shopSectionProducts.shopSection', 'shopSection')
+      .innerJoinAndSelect('shopSection.section', 'section')
+      .innerJoinAndSelect('shopSection.shop', 'shop')
+
+      if (dto.name != undefined &&
+          dto.name != null &&
+          dto.name && dto.name.trim() !== '') {
+        queryBuilder.andWhere('product.name LIKE :name', { name: `%${dto.name}%` });
+      }
+      if (
+        dto.sectionId != undefined &&
+          dto.sectionId != null &&
+          dto.sectionId && dto.sectionId.trim() !== '') {
+        queryBuilder.andWhere('section.id = :sectionId', { sectionId: dto.sectionId });
+      }
+      if (
+        dto.shopId != undefined &&
+          dto.shopId != null &&
+          dto.shopId && dto.shopId.trim() !== ''
+        ) {
+        queryBuilder.andWhere('shopSection.shopId = :shopId', { shopId: dto.shopId });
+      }
+     
+      const shopSectionProducts = await queryBuilder.getMany();
+
+    returnDto.data = shopSectionProducts.map((result) => ({
+      shopSectionProductId: result.id,
+      productId: result.product.id,
+      productName: result.product.name,
+      productPrice:result.product.price,
+      productPhoto: result.product.photo,
+      productDescription: result.product.description,
+      productCaracteristicas: result.product.caracteristicas,
+      existence: result.existence,
+      sectionId: result.shopSection.section.id,
+      sectionName: result.shopSection.section.name,
+      shopId: result.shopSection.shop.id,
+      shopName: result.shopSection.shop.name,
+    }));
+    return returnDto;
+  }
   
+  async searchByIds( dto: SearchSSPDto): Promise<ReturnDto> {
+    const returnDto = new ReturnDto();
+    const queryBuilder = this.repository.createQueryBuilder('shopSectionProducts')
+      .innerJoin('shopSectionProducts.product', 'product')
+      .innerJoin('shopSectionProducts.shopSection', 'shopSection')
+      if (dto.Id != undefined &&
+          dto.Id != null &&
+          dto.Id && dto.Id.trim() !== '') {
+        queryBuilder.andWhere('shopSectionProducts.id = :Id', { Id: dto.Id });
+      }
+      else if (
+        dto.shopId != undefined &&
+          dto.shopId != null &&
+          dto.shopId && dto.shopId.trim() !== '' &&
+          dto.productId != undefined &&
+          dto.productId != null &&
+          dto.productId && dto.productId.trim() !== '' &&
+          dto.sectionId != undefined &&
+          dto.sectionId != null &&
+          dto.sectionId && dto.sectionId.trim() !== ''
+        ) { 
+        queryBuilder.andWhere('shopSection.sectionId = :sectionId', { sectionId: dto.sectionId }); 
+        queryBuilder.andWhere('shopSection.shopId = :shopId', { shopId: dto.shopId });      
+        queryBuilder.andWhere('product.id = :productId', { productId: dto.productId });
+        }
+     
+      const shopSectionProducts = await queryBuilder.getOne();
+
+    returnDto.data = shopSectionProducts
+    return returnDto;
+  }
 }

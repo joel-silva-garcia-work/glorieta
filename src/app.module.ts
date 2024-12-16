@@ -31,9 +31,11 @@ import { ShopSectionsModule } from './shop-sections/shop-sections.module';
 import { TipoCambioModule } from './tipo-cambio/tipo-cambio.module';
 import { TiendaSeccionProductoViewModule } from './tienda-seccion-producto-marca-modelo-view/tienda-seccion-producto-view.module';
 import { ShoppingCartModule } from './shopping-cart/shopping-cart.module';
+import { MailService } from './mail-service/mail-service.service';
  
 @Module({
   imports: [
+    
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -72,7 +74,7 @@ import { ShoppingCartModule } from './shopping-cart/shopping-cart.module';
     ShoppingCartModule,
   ],
   controllers: [],
-  providers: [GlobalesService],
+  providers: [GlobalesService, MailService],
   exports: [GlobalesModule],
 })
 export class AppModule {}

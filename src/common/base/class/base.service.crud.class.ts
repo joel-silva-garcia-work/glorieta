@@ -12,6 +12,7 @@ import { SearchManyDto } from '../dto/search.many.dto';
 import { ComparisonType } from 'src/common/enum/comparison.type.enum';
 import { ConditionSearchDto } from '../dto/condition.search.dto';
 import { RelationSelectDto } from '../dto/relation.search.dto';
+import { MethodEnum } from 'src/common/enum/method.enum';
 
 export class BaseServiceCRUD<
   TEntity,
@@ -172,7 +173,14 @@ export class BaseServiceCRUD<
         scenarios.push(scenario);
       });
       const validated: ClassValidator = new ClassValidator();
-      this.valid = await validated.validate(this.dto.repo, scenarios);
+      if(rules.method = MethodEnum.CREATE)
+      {
+        this.valid = await validated.validateCreate(this.dto.repo, scenarios);
+      }
+      else if(rules.method = MethodEnum.UPDATE)
+      {
+        this.valid = await validated.validateUpdate(dto.id,this.dto.repo, scenarios);
+      }
     }
     return this.valid;
   }

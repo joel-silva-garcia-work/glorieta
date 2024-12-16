@@ -10,9 +10,10 @@ import {
   ValidateNested,
   IsBoolean,
   IsDate,
+  isDateString,
+  IsDateString,
 } from 'class-validator';
 import { ClientInfoCreateDTO } from 'src/client-info/dto/create-client-info.dto';
-import { RulesDto } from 'src/common/base/dto/rules.dto';
 
 
 
@@ -22,19 +23,18 @@ export class CreateOrderDto {
   @IsBoolean()
   toDelivery: boolean;
 
-
   @IsString()  // @IsDate({})
+  @IsDateString()
+  @ApiProperty({
+    type: String,
+    example: '2020-12-31T12:00:00.000Z',
+  })
   fechaEntrega: string;
 
   @ApiProperty()
   @IsUUID()
   @IsString()
   shoppingCartId: string;
-  @ApiProperty()
-  @IsUUID()
-  @IsString()
-  @IsOptional()
-  delivery?: string;
 
   @ApiProperty()
   @IsUUID()
@@ -43,9 +43,7 @@ export class CreateOrderDto {
   clientInfo?: ClientInfoCreateDTO;
 
   noOrden: string;
-  totalProductsPrices: number;
-  totalPrice: number;
-  fechaOrder: string;
+  fechaOrder: string = new Date().toISOString().split('T')[0];
   deliveryState: string;
   orderState: string;
 

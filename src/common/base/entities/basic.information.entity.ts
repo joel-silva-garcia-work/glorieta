@@ -7,7 +7,7 @@ export abstract class BasicInformationEntity
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
 }

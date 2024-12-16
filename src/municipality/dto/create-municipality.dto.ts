@@ -12,9 +12,8 @@ export class CreateMunicipalityDto {
   @IsString()
   name: string;
 
-  @ApiProperty()
-  @IsString()
-  description: string;
+
+  description?: string;
 
   @ApiProperty()
   @IsString()

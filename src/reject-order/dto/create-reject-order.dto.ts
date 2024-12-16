@@ -11,11 +11,6 @@ export class CreateRejectOrderDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
-  rejectProductPrice: number;
-
-  @ApiProperty()
-  @IsNotEmpty()
   @IsUUID()
   orderProductDeliveryId: string;
 

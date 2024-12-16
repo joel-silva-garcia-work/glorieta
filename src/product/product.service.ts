@@ -42,21 +42,12 @@ export class ProductService extends BaseServiceCRUD<
   ) {
     super(repository);
   }
-
-  async openForm(openform: openFormDto):Promise<ReturnDto> {
-    if(openform.id){
-      const search = new SearchManyDto()
-      search.id = openform.id
-      search.queryType = fieldsEnum.ONE
-      search.repo = this.repository
-      return await this.search(search)
-    }
-
-    const returnDto = new ReturnDto
-    const product = new Product();
-    returnDto.data = product
-    return returnDto ;
-  }
+ 
+ async findAllItems() {
+   const returnDto =new ReturnDto;
+   returnDto.data = await this.repository.find({});
+   return returnDto
+ }
   
   @Post('ubicar')
   async locate(createDto: LocateProductDto): Promise<ReturnDto> {

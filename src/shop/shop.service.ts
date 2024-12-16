@@ -14,6 +14,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Section } from 'src/sections/entities/section.entity';
 import { ShopSections } from 'src/shop-sections/entities/shop-section.entity';
 import { Deliveries } from 'src/delivery/entities/delivery.entity';
+import { ShopSearchDto } from './dto/shop-search.dto';
+import { MailService } from 'src/mail-service/mail-service.service';
 @Injectable()
 export class ShopService extends BaseServiceCRUD<
   Shop,
@@ -31,12 +33,37 @@ export class ShopService extends BaseServiceCRUD<
     @InjectRepository(ShopSections)
     private readonly shopSectionRepository: Repository<ShopSections>,
     @InjectRepository(Deliveries)
-    private readonly deliveriesRepository: Repository<Deliveries>
+    private readonly deliveriesRepository: Repository<Deliveries>,
+    private readonly mailService: MailService, // Inyección del servicio de correo
+
   ) {
     super(repository);
   }
 
   async addShop(createDto: CreateShopDto):Promise<ReturnDto>{
+    
+    const emailTemplate = ` bgfmknjbhgbnhjg`
+    // const emailTemplate = `
+    //   <h1>Order Details</h1>
+    //   <p>Order ID: ${order.id}</p>
+    //   <p>Total Price: ${order.totalPrice}</p>
+    //   <p>Total Products Prices: ${order.totalProductsPrices}</p>
+    //   <h2>Products</h2>
+    //   <ul>
+    //     ${order.delivery.map(delivery => `
+    //       <li>
+    //         <p>Product Name: ${delivery.shopSectionProduct.product.name}</p>
+    //         <p>Product Description: ${delivery.shopSectionProduct.product.description}</p>
+    //         <p>Amount: ${delivery.amountProduct}</p>
+    //         <p>Price: ${delivery.shopSectionProduct.product.price}</p>
+    //       </li>
+    //     `).join('')}
+    //   </ul>
+    // `;
+  
+    // Assuming you have a mail service to send emails
+    await this.mailService.sendEmail('joel.silva.garcia.work@gmail.com', 'Your Order Details', emailTemplate);
+    
     const returnDto = new ReturnDto
     let valid = true;
     if (createDto.rules) {
@@ -132,6 +159,42 @@ export class ShopService extends BaseServiceCRUD<
       returnDto.errorMessage = error.message;
       returnDto.returnCode = error.code;
     }
+    return returnDto;
+  }
+
+  async findBy(searchDto: ShopSearchDto): Promise<ReturnDto> {
+    const returnDto = new ReturnDto();
+    const queryBuilder = this.repository.createQueryBuilder('shop')
+      .leftJoinAndSelect('shop.municipality', 'municipality')
+ 
+    if (searchDto.name) {
+      queryBuilder.andWhere('shop.name LIKE :name', { name: `%${searchDto.name}%` });
+    }
+    if (searchDto.description) {
+      queryBuilder.andWhere('shop.description LIKE :description', { description: `%${searchDto.description}%` });
+    }
+    if (searchDto.phone) {
+      queryBuilder.andWhere('shop.phone LIKE :phone', { phone: `%${searchDto.phone}%` });
+    }
+    if (searchDto.email) {
+      queryBuilder.andWhere('shop.email LIKE :email', { email: `%${searchDto.email}%` });
+    }
+    if (searchDto.address) {
+      queryBuilder.andWhere('shop.address LIKE :address', { address: `%${searchDto.address}%` });
+    }
+    if (searchDto.municipality) {
+      queryBuilder.andWhere('municipality.id = :municipality', { municipality: searchDto.municipality });
+    }
+    // if (searchDto.orderBy) {
+    //   queryBuilder.orderBy(searchDto.orderBy);
+    // }
+    if (searchDto.skip) {
+      queryBuilder.skip(searchDto.skip);
+    }
+    if (searchDto.take) {
+      queryBuilder.take(searchDto.take);
+    }
+    returnDto.data = await queryBuilder.getMany();
     return returnDto;
   }
 }

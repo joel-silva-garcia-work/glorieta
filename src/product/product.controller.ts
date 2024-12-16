@@ -17,19 +17,20 @@ export class ProductController extends BaseControllerCRUD<CreateProductDto,Updat
     super(Service)
   }  
   // @Get('/nuevo')
-  // @Render('marcas/nuevo') // Renderiza la vista 'listar.ejs'
+  // ruta views/producto/nuevo.ejs
+  // @Render('producto/nuevo') // Renderiza la vista 'listar.ejs'
   // async openForm(
   //   @Req() request: Request,
   //   @Body() openform: openFormDto) 
   //     :Promise<any> {
   //     const csrfToken = request.csrfToken(); // Genera el token CSRF
 
-  //   const marca = await this.Service.openForm(openform);
-  //   return {marca, csrfToken } ;
+  //   const producto = await this.Service.openForm(openform);
+  //   return {producto, csrfToken } ;
   // }
   @Get('items')
-  async findItems(@Body() searchDto: ProductSearchDto): Promise<ReturnDto> {
-    return this.Service.findItems(searchDto) ;
+  async findItems(): Promise<ReturnDto> {
+    return this.Service.findAllItems() ;
   }
 
 }

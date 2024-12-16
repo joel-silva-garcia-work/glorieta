@@ -13,13 +13,8 @@ export class CreateProvinceDto {
   @IsString()  
   name: string;
 
-  @ApiProperty()
-  @IsString()
-  description: string;
 
-  @ApiProperty()
-  @IsString()
-  country: string;
+  description?: string;
 
   @ApiProperty()
   @IsNotEmpty()

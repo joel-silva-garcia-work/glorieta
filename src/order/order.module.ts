@@ -21,7 +21,8 @@ import { OrderStateModule } from 'src/order-state/order-state.module';
 import { OrderStates } from 'src/order-state/entities/order-state.entity';
 import { Shop } from 'src/shop/entities/shop.entity';
 import { DeliveryState } from 'src/delivery-state/entities/delivery-state.entity';
-
+import { MailService } from 'src/mail-service/mail-service.service';
+ 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -49,6 +50,6 @@ import { DeliveryState } from 'src/delivery-state/entities/delivery-state.entity
 
 ],
   controllers: [OrderController],
-  providers: [OrderService],
+  providers: [OrderService,MailService],
 })
 export class OrderModule {}
